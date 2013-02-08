@@ -1,0 +1,22 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package main;
+
+/**
+ *
+ * @author Knacky
+ */
+public enum NameSpace {
+        ALL,CC, MF, BP;
+        public static NameSpace getNameSpace(String s){
+            if (s.equals("biological_process"))
+                return BP;
+            else if (s.equals("molecular_function"))
+                return MF;
+            else 
+                return CC;
+        }
+}

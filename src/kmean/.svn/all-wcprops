@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 38
+/svn/repos/!svn/ver/31/trunk/src/kmean
+END
+MeanVector.java
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/repos/!svn/ver/31/trunk/src/kmean/MeanVector.java
+END
+KMeanClusterer.java
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/repos/!svn/ver/31/trunk/src/kmean/KMeanClusterer.java
+END
+DataCluster.java
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/svn/repos/!svn/ver/31/trunk/src/kmean/DataCluster.java
+END
+DataVector.java
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/repos/!svn/ver/31/trunk/src/kmean/DataVector.java
+END
+KMeanClusterer 5 Aug 09.java.txt
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/repos/!svn/ver/31/trunk/src/kmean/KMeanClusterer%205%20Aug%2009.java.txt
+END

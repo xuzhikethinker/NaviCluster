@@ -1,0 +1,30 @@
+load vertices time: Time Used: 0 hour(s) 0 minute(s) 5 second(s) OR elapsedTimeMillis: 5355
+Load edges time: Time Used: 0 hour(s) 0 minute(s) 8 second(s) OR elapsedTimeMillis: 8951
+num nodes: 1795 num edges: 2954
+Num nodes double checked: 1795.0 Num edges double checked: 2954
+Time used for loading from input file: Time Used: 0 hour(s) 0 minute(s) 14 second(s) OR elapsedTimeMillis: 14344
+After Louvain Clustering
+Start process raw cluster set!
+After processing LC and running property-based clustering
+Start property-based clustering!
+Start transform data cluster to metanodes...
+End transform data cluster to metanodes...
+End property-based clustering!
+GO Processor clusterScoreMap size: 167
+Time to create vertices Time Used: 0 hour(s) 0 minute(s) 0 second(s) OR elapsedTimeMillis: 0
+Time to create property edges Time Used: 0 hour(s) 0 minute(s) 0 second(s) OR elapsedTimeMillis: 322
+Time to create metaedges Time Used: 0 hour(s) 0 minute(s) 0 second(s) OR elapsedTimeMillis: 11
+Time to add metaedges to the graph Time Used: 0 hour(s) 0 minute(s) 0 second(s) OR elapsedTimeMillis: 3
+Time used for creating graph from cSet: Time Used: 0 hour(s) 0 minute(s) 0 second(s) OR elapsedTimeMillis: 336
+Time used for multi-step layout: Time Used: 0 hour(s) 0 minute(s) 2 second(s) OR elapsedTimeMillis: 2279
+8
+Start property-based clustering!
+Start transform data cluster to metanodes...
+End transform data cluster to metanodes...
+End property-based clustering!
+GO Processor clusterScoreMap size: 166
+Time to create vertices Time Used: 0 hour(s) 0 minute(s) 0 second(s) OR elapsedTimeMillis: 0
+Time to create property edges Time Used: 0 hour(s) 0 minute(s) 0 second(s) OR elapsedTimeMillis: 579
+Time to create metaedges Time Used: 0 hour(s) 0 minute(s) 0 second(s) OR elapsedTimeMillis: 3
+Time to add metaedges to the graph Time Used: 0 hour(s) 0 minute(s) 0 second(s) OR elapsedTimeMillis: 2
+Time used for multi-step layout: Time Used: 0 hour(s) 0 minute(s) 2 second(s) OR elapsedTimeMillis: 2074

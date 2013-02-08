@@ -1,0 +1,951 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package main;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.geneontology.oboedit.dataadapter.DefaultOBOParser;
+import org.geneontology.oboedit.dataadapter.OBOParseEngine;
+import org.geneontology.oboedit.dataadapter.OBOParseException;
+import org.geneontology.oboedit.datamodel.IdentifiedObject;
+import org.geneontology.oboedit.datamodel.Link;
+import org.geneontology.oboedit.datamodel.LinkedObject;
+import org.geneontology.oboedit.datamodel.OBOClass;
+import org.geneontology.oboedit.datamodel.OBORestriction;
+import org.geneontology.oboedit.datamodel.OBOSession;
+import org.geneontology.oboedit.datamodel.impl.OBORestrictionImpl;
+import kmean.DataVector;
+import kmean.DataCluster;
+import kmean.KMeanClusterer;
+import util.StopWatch;
+
+/**
+ *
+ * @author Knacky
+ */
+
+
+public class GOProcessor {
+    static OBOSession session;
+//    ArrayList<String> GOIDList = new ArrayList<String>();
+    
+//    static Map<String,Integer> GODepthMap = new HashMap<String, Integer>();
+    static Set<GOTerm> setOfGO = new HashSet<GOTerm>();
+    
+//    static Map<Object,ArrayList<Entry<String,ArrayList>>> clusterNumMemMap = 
+//            new HashMap<Object,ArrayList<Entry<String,ArrayList>>>();
+//    static Map<Object,ArrayList<Entry<GOTerm,Double>>> clusterNumMemMap = 
+//            new HashMap<Object,ArrayList<Entry<GOTerm,Double>>>();
+    Map<Object,Map<GOTerm,Double>> clusterNumMemMap = 
+            new HashMap<Object,Map<GOTerm,Double>>();
+//    static Map<Object,ArrayList<Entry<GOTerm,Double>>> clusterScoreMap = 
+//            new HashMap<Object,ArrayList<Entry<GOTerm,Double>>>();
+    /**
+     * Use clusterScoreMap for storing information for both bioNodes and cluster
+     */
+    Map<Object,Map<GOTerm,Double>> clusterScoreMap = 
+            new HashMap<Object,Map<GOTerm,Double>>();
+    
+    //universeGOId not used anymore
+    static Set<String> universeGOId = new HashSet<String>();
+    public static Map<NameSpace,Double> weightMap = new HashMap();
+//    public double ccWeight = 1;
+//    public double mfWeight = 1;
+//    public double bpWeight = 1;
+    
+    private static int getDepth(IdentifiedObject oboclass){
+        
+        int depth = 0;
+        int max = -1;
+//        if (oboclass instanceof OBORestriction){
+//            OBORestrictionImpl obo = (OBORestrictionImpl) oboclass;
+//            return getDepth(obo.getParent());
+//        
+//        }
+        String name = "";
+        
+        if (oboclass instanceof OBOClass) {
+            GOTerm term = GOTerm.findGO(setOfGO, oboclass.getID());
+            if (term != null)
+                return term.getDepth();
+//            if (GODepthMap.containsKey(oboclass.getID()))
+//                return GODepthMap.get(oboclass.getID());
+//            System.out.println("id: "+oboclass.getID());
+            for (Link obj : ((OBOClass) oboclass).getParents()) {
+//                System.out.println(obj.getID());
+//                System.out.println(obj.getType());
+                if (!obj.getType().toString().contains("is_a") && !obj.getType().toString().contains("part_of"))
+                    continue;
+                if (obj instanceof OBORestrictionImpl) {
+//                    OBORestrictionImpl parent = (OBORestrictionImpl) obj;
+                    OBOClass parent = (OBOClass) obj.getParent();
+                    
+//                    System.out.println(parent.getType());
+                    // detect biological pocess, cellular component, molecular function
+//                    if (("GO:0008150".equals(parent.getID())) || ("GO:0005575".equals(parent.getID())) 
+//                            || ("GO:0003674".equals(parent.getID())))
+//                        return 1;
+                    
+                    depth = getDepth(parent);
+                    if (depth > max) {
+                        name = obj.getParent().getID();
+                        max = depth;
+                    }
+                }
+            }
+//            System.out.print("parent: "+name+"\t");
+            if (term == null)
+            {
+                term = new GOTerm(oboclass.getID());
+                term.setDepth(max+1);
+                setOfGO.add(term);
+            }
+            
+//            GODepthMap.put(oboclass.getID(),max+1);
+            return max+1;
+            
+        }
+        return 0;
+        
+       
+        
+    }
+    // not used anymore, use K mean similarity instead
+    public double similarity(Set cluster1, Set cluster2){
+        double zigma = 0;
+//        ArrayList<Entry<GOTerm,Double>> cluster1ScoreMap;
+        Map<GOTerm,Double> cluster1ScoreMap;
+//        ArrayList<Entry<GOTerm,Double>> cluster2ScoreMap;
+        Map<GOTerm,Double> cluster2ScoreMap;
+        if (cluster1 == cluster2)
+            System.out.println("Yeah equal");
+        cluster1ScoreMap = new HashMap<GOTerm, Double>(clusterScoreMap.get(cluster1));
+        cluster2ScoreMap = new HashMap<GOTerm, Double>(clusterScoreMap.get(cluster2));
+//        System.out.println("size cluster 1 map: "+cluster1ScoreMap.size());
+//        System.out.println("size cluster 2 map: "+cluster2ScoreMap.size());
+        for (Entry<GOTerm, Double> entry : cluster1ScoreMap.entrySet()){
+            GOTerm term = GOTerm.findGO(cluster2ScoreMap.keySet(), entry.getKey().getId());
+            if (term != null){
+                zigma += entry.getValue() * cluster2ScoreMap.get(term);
+//                System.out.println("zigma: "+zigma);
+            }
+            
+                
+        }
+
+        return zigma;
+//        return 0;
+    }
+    
+    // not used anymore, use K mean similarity matrix instead
+    public void calcSimMatrix(Set<Set<Object>> cSet){
+        double sim = 0, max = -1;
+        int indexjmax = -1;
+        Set[] arrCluster = cSet.toArray(new Set[1]);
+        int[] arrOfMax = new int[cSet.size()];
+        for (int i = 0; i < arrCluster.length; i++){
+            max = -1;
+            indexjmax = -1;
+            for (int j = 0; j < arrCluster.length-i; j++){
+                if (i == j)
+                    continue;
+//                System.out.println("i: "+arrCluster[i]+" "+clusterScoreMap.get(arrCluster[i]).size());
+//                System.out.println("j: "+arrCluster[j]+" "+clusterScoreMap.get(arrCluster[j]).size());
+//                System.out.println("i: "+arrCluster[i]+" "+clusterNumMemMap.get(arrCluster[i]).size());
+//                System.out.println("j: "+arrCluster[j]+" "+clusterNumMemMap.get(arrCluster[j]).size());
+                sim = similarity(arrCluster[i],arrCluster[j]);
+                if (sim > max)
+                {
+                    max = sim;
+                    indexjmax = j;
+                }
+//                System.out.println("Similarity: of size "+arrCluster[i].size()+" and size "+arrCluster[j].size()+" is "+sim);
+            }
+            arrOfMax[i] = indexjmax;
+//            System.out.println("Max sim of i size "+arrCluster[i].size()+" is with "+arrCluster[indexjmax].size()+" score is "+max);
+            Set set = new HashSet();
+            for (GOTerm goterm : clusterScoreMap.get(arrCluster[i]).keySet())
+            {
+                set.add(goterm.getId());
+            }
+//            System.out.println("i GO Term: "+clusterScoreMap.get(arrCluster[i]).keySet().size());
+            Set set2 = new HashSet();
+            for (GOTerm goterm : clusterScoreMap.get(arrCluster[indexjmax]).keySet())
+            {
+                set2.add(goterm.getId());
+            }
+            set.retainAll(set2);
+//            System.out.println("indexjmax GO Term: "+clusterScoreMap.get(arrCluster[indexjmax]).keySet().size());
+//            System.out.println("common go terms: "+set.size());
+        }
+        
+        int i = -1, tmp = 0;
+//        Arrays.fill(arrOfMax, -1);
+        Set subset = new HashSet();
+        Set setOfSet = new HashSet();
+        int size = arrOfMax.length;
+        
+        while (size > 0){
+            do {
+                i++;
+                if (i == arrOfMax.length)
+                {
+                    i = 0;
+                }
+            }
+            while (arrOfMax[i] == -1 );
+            boolean already = false;
+            while (!subset.contains(i)){
+//                System.out.println(i);
+                if (arrOfMax[i] == -1){
+                    Set tempSubSet = null;
+                    for (Object s : setOfSet){
+                        Set ss = (Set)s;
+                        if (ss.contains(i)){
+                            tempSubSet = ss;
+                            break;
+                        }
+                    }
+                    tempSubSet.addAll(subset);
+                    subset = tempSubSet;
+                    already = true;
+//                    System.out.println(subset);
+                    break;
+                }
+                subset.add(i);
+                tmp = arrOfMax[i];
+                arrOfMax[i] = -1;
+                i = tmp;
+                size--;
+//                System.out.println(subset);
+                
+            }
+            if (!already)
+//            if (!setOfSet.contains(subset))
+                setOfSet.add(subset);
+            subset = new HashSet();
+            
+            
+        }
+        System.out.println("size of setofset: "+setOfSet.size());
+        for (Object s : setOfSet){
+            System.out.println((Set)s);
+        }
+//        for (Set<Object> cluster1 : cSet){
+//            for (Set<Object> cluster2 : cSet){
+//                if (cluster1 == cluster2)
+//                    continue;
+//                
+//            }
+//        }
+    }
+    
+    //not used anymore
+    public void createNewGOMapByScore(){
+        Map<GOTerm,Set> newClusterGO = new HashMap<GOTerm, Set>();
+        for (Object cluster : clusterNumMemMap.keySet())
+        {
+//            ArrayList arrList = clusterNumMemMap.get(cluster);
+            Map arrList = clusterNumMemMap.get(cluster);
+            int i = 0;
+//            for (Object obj : arrList) {
+            for (Object obj : arrList.entrySet()) {
+                //get only highest GO Term
+//                Entry entry = (Entry) arrList.get(0);
+                if (i >= 1)
+                    break;
+                Entry entry = (Entry) obj;
+                GOTerm goterm = (GOTerm)entry.getKey();
+                String GOId = goterm.getId();
+                double percent = (Double) (entry.getValue());
+//                double percent = (Double) ((ArrayList) entry.getValue()).get(0);
+                int depth = goterm.getDepth();
+//                int depth = (Integer) ((ArrayList) entry.getValue()).get(1);
+                // threshold
+                if ((percent >= 0.5) && (depth > 5)) {
+                    GOTerm newgo = GOTerm.findGO(newClusterGO.keySet(), GOId);
+                    if (newgo == null){
+
+//                    if (!newClusterGO.containsKey(GOId)) {
+                        Set set = new HashSet();
+                        newgo = new GOTerm(GOId,depth);
+                        newClusterGO.put(newgo, set);
+                        set.add((Set<Object>) cluster);
+                    } else {
+                        newClusterGO.get(newgo).add((Set<Object>) cluster);
+                    }
+                }
+                i++;
+            }
+        }
+        for (GOTerm term : newClusterGO.keySet()){
+            if (newClusterGO.get(term).size() >= 2)
+                System.out.println(term.getId()+" contained mostly in nodes of "+newClusterGO.get(term).size() +" clusters");
+        }
+//        for (String s : newClusterGO.keySet()){
+//            if (newClusterGO.get(s).size() >= 2)
+//                System.out.println(s+" contained mostly in nodes of "+newClusterGO.get(s).size() +" clusters");
+//        }
+    }
+    
+    static Map<String,GOTerm> goTermsMap = new HashMap<String,GOTerm>();
+    /** 
+     * Load GO Terms from text file
+     * Text file stores GO ids, names, depths, etc.
+     * @throws java.io.FileNotFoundException
+     * @throws java.io.IOException
+     */
+    public static void loadGOTermsMap() throws FileNotFoundException, IOException{
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(new File("GO_with_depth.txt"))));
+        String st = "";
+        StringTokenizer stn = null;
+        int count = 0;
+        while ((st = br.readLine()) != null){
+            stn = new StringTokenizer(st,"\t");
+            String id = stn.nextToken();
+            String name = stn.nextToken();
+            String namespace = stn.nextToken();
+//            System.out.println(id+ " "+name+" "+namespace);
+            int depth = Integer.parseInt(stn.nextToken());
+            GOTerm term = new GOTerm(id,depth);
+//            System.out.println(NameSpace.valueOf(namespace));
+            term.setName(name); term.setNamespace(NameSpace.valueOf(namespace));
+            goTermsMap.put(id, term);
+            count ++;
+        }
+        System.out.println("count "+count);
+        
+    }
+//    public Map<Object,Map<GOTerm,Double>> populateGOTerms(Set<BioObject> cSet){
+//        clusterScoreMap = 
+//            new HashMap<Object,Map<GOTerm,Double>>();
+//                
+//        Map<GOTerm,Double> scoreMap = new HashMap<GOTerm, Double>();
+//        setOfGO.add(new GOTerm("GO:0008150", 1));
+//        setOfGO.add(new GOTerm("GO:0005575", 1));
+//        setOfGO.add(new GOTerm("GO:0003674",1));
+//        for ( BioObject bioNode :cSet){
+//            scoreMap.clear();
+////            Set GOSet = new HashSet();
+//            int i = 0;
+//            String name = "";
+//
+////            for (Object node : cluster) { 
+////                BioObject bioNode = (BioObject) node;
+////                System.out.println("Node "+bioNode);
+//                Set<String> goidset = new HashSet<String>();
+//                goidset.addAll(bioNode.getGoIdList());
+//                for (String id : goidset){
+////                    System.out.println("id: "+id);
+////                    GOTerm term = goTermsMap.get(id);
+//                    GOTerm term = GOTerm.findGO(scoreMap.keySet(), id);
+//                    if (term == null) {
+//
+//                        /* Don't use getDepth anymore */
+//                        int depth = 0;
+//
+//                        term = new GOTerm(id, goTermsMap.get(id).getDepth());
+//                        /* for bioObject, for each GO term, the score is the depth of that term */
+//                        scoreMap.put(term, (double) 1 * term.getDepth());
+//                    } 
+////                    else {
+////
+////                        scoreMap.put(term,(Double)scoreMap.get(term)+((double)1/cluster.size()*term.getDepth()));
+////                    }
+//                }
+//                
+////            }
+//            double normalizedFactor = 0.0;
+//            for (Entry<GOTerm,Double> entry : scoreMap.entrySet()){
+//                normalizedFactor += entry.getValue()*entry.getValue();
+//            }
+//            normalizedFactor = Math.sqrt(normalizedFactor);
+//            for (GOTerm key : scoreMap.keySet()){
+//                scoreMap.put(key, scoreMap.get(key)/normalizedFactor);
+//            }
+////            System.out.println("Map size: "+GODepthMap.size());
+////            System.out.println("Map: "+GODepthMap);
+////            System.out.println("Stat for cluster");
+////            System.out.println("Size: " + cluster.size());
+//            
+//            Map<GOTerm,Double> map =  new HashMap<GOTerm, Double>(scoreMap);
+//            clusterScoreMap.put(bioNode, map);
+//            
+////            System.out.println("scoreMap size: "+scoreMap.size());
+//                        
+////            for (Object obj : sortedSet)
+////            {
+////                Entry<String,ArrayList> entry = (Entry)obj;
+////                double score = (double)((Integer)entry.getValue().get(0))/cluster.size() * (Integer)entry.getValue().get(1);
+////                System.out.println(entry.getKey() + " has " + entry.getValue().get(0) + " member(s) and depth " + entry.getValue().get(1)+" score: "+score);
+////            }
+//            
+//        }
+////        for (Object entry : clusterScoreMap.keySet() ){
+////            Set<Object> cluster = (Set<Object>)entry;
+////            System.out.println("size : "+clusterScoreMap.get(cluster).size());
+////        }
+//        System.out.println("clusterScoreMap size: "+clusterScoreMap.size());
+////        System.out.println("membersGOIDmap size: "+clusterNumMemMap.size());
+////        createNewGOMapByScore();
+////        calcSimMatrix(cSet);
+////        preCluster(cSet);
+////        for (Set<Object> cluster : cSet){
+////            System.out.println("cluster size: "+cluster.size()+" Top GO Term: "+clusterNumMemMap.get(cluster));
+////        }
+//        return clusterScoreMap;
+////        return null;
+//    }
+    
+    public static void setWeightMap(Map map){
+        weightMap = map;
+    }
+    public static Map<NameSpace,Double> getWeightMap(){
+        return weightMap;
+    }
+    public Map<Object,Map<GOTerm,Double>> populateGOTerms(Set cSet){
+//        weightMap.put(NameSpace.BP, 1.0);
+//        weightMap.put(NameSpace.MF, 1.0);
+//        weightMap.put(NameSpace.CC, 1.0);
+//        System.out.println("weightmap cc"+weightMap.get(NameSpace.CC));
+       
+//        if (cSet.iterator().next() instanceof BioObject) {
+//            isBioObjectSet = true;
+//        }
+        
+//        Map<String,ArrayList> numMembersMap = new HashMap<String,ArrayList>();
+        clusterScoreMap =
+                new HashMap<Object, Map<GOTerm, Double>>();
+        /* clusterNumMemMap is now not updated when treating with set of BioObjects */
+        clusterNumMemMap =
+                new HashMap<Object, Map<GOTerm, Double>>();
+        Map<GOTerm, Double> numMembersMap = new HashMap<GOTerm, Double>();
+        Map<GOTerm, Double> scoreMap = new HashMap<GOTerm, Double>();
+        setOfGO.add(new GOTerm("GO:0008150", 1));
+        setOfGO.add(new GOTerm("GO:0005575", 1));
+        setOfGO.add(new GOTerm("GO:0003674", 1));
+        for (Object obj : cSet) {
+            
+            boolean isBioObjectSet = false;
+            Set cluster = null;
+            BioObject bioNode = null;
+//            if (isBioObjectSet) {
+            if (obj instanceof BioObject) {
+                bioNode = (BioObject) obj;
+                isBioObjectSet = true;
+            } else if (obj instanceof Set){
+                cluster = (Set) obj;
+            } else
+                System.out.println("Error neither BioObj nor Set");
+
+            numMembersMap.clear();
+            scoreMap.clear();
+            int i = 0;
+            String name = "";
+            
+//            GODepthMap.put("GO:0008150", 1);
+//            GODepthMap.put("GO:0005575", 1);
+//            GODepthMap.put("GO:0003674", 1);
+            if (isBioObjectSet) {
+
+//            for (Object node : cluster) { 
+//                BioObject bioNode = (BioObject) node;
+//                System.out.println("Node "+bioNode);
+                Set<String> goidset = new HashSet<String>();
+                goidset.addAll(bioNode.getGoIdList());
+                for (String id : goidset) {
+//                    System.out.println("id: "+id);
+//                    GOTerm term = goTermsMap.get(id);
+                    GOTerm term = GOTerm.findGO(scoreMap.keySet(), id);
+                    
+                    if (term == null) {
+
+                        /* Don't use getDepth anymore */
+//                        int depth = 0;
+
+                        term = new GOTerm(id, goTermsMap.get(id).getDepth());
+                        term.setNamespace(goTermsMap.get(id).getNamespace());
+                        /* for bioObject, for each GO term, the score is the depth of that term */
+                        scoreMap.put(term, (double) 1 * term.getDepth()*weightMap.get(term.getNamespace()));
+                    }
+                /* There shouldn't be duplicate of a specific GO term in one BioObject */
+//                    else {
+//
+//                        scoreMap.put(term,(Double)scoreMap.get(term)+((double)1/cluster.size()*term.getDepth()));
+//                    }
+                }
+
+            } else {
+                for (Object node : cluster) {
+                    bioNode = (BioObject) node;
+//                System.out.println("Node "+bioNode);
+                    Set<String> goidset = new HashSet<String>();
+                    goidset.addAll(bioNode.getGoIdList());
+                    for (String id : goidset) {
+//                    universeGOId.add(id);
+//                    System.out.println("id: "+id);
+//                    GOTerm term = goTermsMap.get(id);
+//                        GOTerm term = GOTerm.findGO(numMembersMap.keySet(), id);
+//                        GOTerm term = scoreMap.get(goTermsMap.get(id));
+                        GOTerm term = goTermsMap.get(id);
+                        if (!scoreMap.containsKey(goTermsMap.get(id))) {
+//                        if (term == null)
+//                    if (!numMembersMap.containsKey(id))
+//                    {
+
+//                        ArrayList a = new ArrayList();
+//                        numMembersMap.put(id,a );
+//                        a.add((double)1/cluster.size());
+//                        System.out.println((double)1/cluster.size());
+                        /* Don't use getDepth anymore */
+//                            int depth = 0;
+//                        System.out.println("id: "+id);
+//                        IdentifiedObject obj = session.getObject(id);
+//                        IdentifiedObject obj = session.getObject("GO:0032501");
+//                        if (id.equals("GO:0000003")){
+//                            int bbb = 2;
+//                        }
+//                        System.out.print(id+"\t");
+//                        if (obj instanceof OBOClass){
+//                            OBOClass oboclass = (OBOClass)obj;
+//                            depth = getDepth(oboclass);
+                            /* debug 10 Apr 09 */
+//                            term = new GOTerm(id, goTermsMap.get(id).getDepth());
+//                            term.setNamespace(goTermsMap.get(id).getNamespace());
+//                            numMembersMap.put(term, (double) 1 / cluster.size());
+                            scoreMap.put(term, (double) 1 / cluster.size() * term.getDepth()*weightMap.get(term.getNamespace()));
+//                            a.add(depth);
+//                        }
+                        } else {
+//                        numMembersMap.get(id).set(0, (Double)numMembersMap.get(id).get(0)+(double)1/cluster.size());
+//                            numMembersMap.put(term, (Double) numMembersMap.get(term) + (double) 1 / cluster.size());
+                            scoreMap.put(term, (Double) scoreMap.get(term) + ((double) 1 / cluster.size() * term.getDepth())*weightMap.get(term.getNamespace()));
+                        }
+                    }
+//                System.out.println("");
+
+                }
+
+            }
+            double normalizedFactor = 0.0;
+            for (Entry<GOTerm, Double> entry : scoreMap.entrySet()) {
+                normalizedFactor += entry.getValue() * entry.getValue();
+            }
+            normalizedFactor = Math.sqrt(normalizedFactor);
+            for (GOTerm key : scoreMap.keySet()) {
+                scoreMap.put(key, scoreMap.get(key) / normalizedFactor);
+            }
+//            System.out.println("Map size: "+GODepthMap.size());
+//            System.out.println("Map: "+GODepthMap);
+//            System.out.println("Stat for cluster");
+//            System.out.println("Size: " + cluster.size());
+            
+            Map<GOTerm, Double> map = new HashMap<GOTerm, Double>(numMembersMap);
+            clusterNumMemMap.put(cluster, map);
+//            System.out.println("numberMap size: "+numMembersMap.size());
+            map.clear();
+            map = new HashMap<GOTerm, Double>(scoreMap);
+            
+            
+            if (isBioObjectSet){
+//              clusterScoreMap.remove(cluster);
+                clusterScoreMap.put(bioNode, map);
+            } else {
+                clusterScoreMap.put(cluster, map);
+            } 
+            
+
+//            System.out.println("scoreMap size: "+scoreMap.size());
+
+//            collectGOMembersMap(cluster, numMembersMap);
+//            collectGOScoreMap(cluster, scoreMap);
+
+
+//            for (Object obj : sortedSet)
+//            {
+//                Entry<String,ArrayList> entry = (Entry)obj;
+//                double score = (double)((Integer)entry.getValue().get(0))/cluster.size() * (Integer)entry.getValue().get(1);
+//                System.out.println(entry.getKey() + " has " + entry.getValue().get(0) + " member(s) and depth " + entry.getValue().get(1)+" score: "+score);
+//            }
+//            for (String id : numMembersMap.keySet()) {
+//                System.out.println(id + " has " + ((Integer) numMembersMap.get(id).get(0)) + " member(s) and depth " + numMembersMap.get(id).get(1));
+//            }
+//            break;
+
+//        for (Object entry : clusterScoreMap.keySet() ){
+//            Set<Object> cluster = (Set<Object>)entry;
+//            System.out.println("size : "+clusterScoreMap.get(cluster).size());
+//        }
+        }
+
+        System.out.println("clusterScoreMap size: " + clusterScoreMap.size());
+//        System.out.println("membersGOIDmap size: "+clusterNumMemMap.size());
+//        createNewGOMapByScore();
+//        calcSimMatrix(cSet);
+//        preCluster(cSet);
+//        for (Set<Object> cluster : cSet){
+//            System.out.println("cluster size: "+cluster.size()+" Top GO Term: "+clusterNumMemMap.get(cluster));
+//        }
+
+
+        return clusterScoreMap;
+    }
+    
+    Map <Object,DataVector> nodesGOVectorMap = new HashMap<Object, DataVector>();
+    
+    /**
+     * Assume that populateGOTerms is already called.
+     * Just transform clusterScoreMap to map of cluster and datavector
+     * Do not clear nodesGOVectorMap for sake of reusability with nodes of many levels
+     * @param cSet
+     * @return nodesGOVectorMap
+     */
+    public Map<Object, DataVector> getNodesGOVectorMapBeforeCluster(Set cSet){
+//        boolean isBioObject = false;
+//        if (cSet.size() != 0){
+//            if (cSet.iterator().next() instanceof BioObject){
+//                isBioObject = true;
+//            }
+//        }
+        for (Object obj : cSet){
+//            Set cluster = (Set)obj;
+            if (clusterScoreMap.get(obj)==null)
+                System.out.println("Vertex : "+obj+" has no clusterScoreMap");
+            DataVector vec = new DataVector(clusterScoreMap.get(obj));
+            vec.nodeRef = obj;
+            nodesGOVectorMap.put(obj, vec);
+        }
+        return nodesGOVectorMap;
+    }
+    
+    /**
+     * For set of BioObject only
+     * Assume that for BioObject set, cSet is the same as comNodeCSet
+     * @param cSet
+     * @param numCluster
+     * @return
+     */
+    public DataCluster[] preCluster(Set cSet,int numCluster){
+        KMeanClusterer kCluster = new KMeanClusterer(numCluster);
+        
+//        Set[] arrCluster = cSet.toArray(new Set[1]);
+        Object[] arrCluster = cSet.toArray(new Object[1]);
+                
+        for (int i = 0; i < arrCluster.length; i++){
+
+            Map<GOTerm,Double> scoreMap;
+            Map<String,Double> stringScoreMap;
+            Map map = clusterScoreMap.get(arrCluster[i]);
+            if (map == null)
+                System.out.println("NULL++++++++");
+            scoreMap = new HashMap<GOTerm, Double>(map);
+            stringScoreMap = new HashMap<String, Double>();
+//            double[] arrOfScore = new double[nameList.size()];
+//            double[] arrOfScore = new double[scoreMap.entrySet().size()];
+//            String[] arrOfId = new String[scoreMap.entrySet().size()];
+            int ind = 0;
+            for (Entry<GOTerm, Double> entry : scoreMap.entrySet()){
+//                System.out.println(entry.getKey());
+//                int ind = nameList.indexOf(entry.getKey().getId());
+//                arrOfScore[ind] = entry.getValue();
+//                arrOfId[ind] = entry.getKey().getId();
+                stringScoreMap.put(entry.getKey().getId(), entry.getValue());
+                ind++;
+            }
+//            DataVector vec = new DataVector(arrOfScore);
+//            DataVector vec = new DataVector(stringScoreMap);
+            DataVector vec = new DataVector(map);
+            
+            vec.nodeRef = arrCluster[i];
+            /* vec.comNodeClusterRef has no special meaning in this case */
+            vec.comNodeClusterRef = arrCluster[i];
+            
+            kCluster.dataVectorList.add(vec);
+//            vec.setNameList(arrOfId);
+                
+        }
+        kCluster.assignKPoint();
+        StopWatch sw = new StopWatch();
+        sw.start();
+        kCluster.cluster();
+        sw.stop();
+        System.out.println("Time used for clustering: "+sw);
+
+        return kCluster.getClusterList();
+        
+    }
+    
+    public DataCluster[] preCluster(Map<Set, Set> comNodeClustToFlatClust,Set<Set> comNodeCSet, Set<Set> cSet,int numCluster){
+        KMeanClusterer kCluster = new KMeanClusterer(numCluster);
+        
+        /*codes below may not be used anymore */
+//        ArrayList<String> nameList = new ArrayList<String>();
+//        nameList.addAll(universeGOId);
+//        kCluster.populateNameList(nameList.toArray(new String[1]));
+////        System.out.println(universeGOId.size());
+////        kCluster.printNameList();
+//        kCluster.numDim = universeGOId.size(); 
+        /* end */
+        
+//        Set[] arrCluster = cSet.toArray(new Set[1]);
+        Set[] arrCluster = comNodeCSet.toArray(new Set[1]);
+                
+        for (int i = 0; i < arrCluster.length; i++){
+
+            Map<GOTerm,Double> scoreMap;
+            Map<String,Double> stringScoreMap;
+            if (clusterScoreMap.get(comNodeClustToFlatClust.get(arrCluster[i])) == null)
+                System.out.println("NULLL");
+            scoreMap = new HashMap<GOTerm, Double>(clusterScoreMap.get(comNodeClustToFlatClust.get(arrCluster[i])));
+            stringScoreMap = new HashMap<String, Double>();
+//            double[] arrOfScore = new double[nameList.size()];
+//            double[] arrOfScore = new double[scoreMap.entrySet().size()];
+//            String[] arrOfId = new String[scoreMap.entrySet().size()];
+            int ind = 0;
+            for (Entry<GOTerm, Double> entry : scoreMap.entrySet()){
+//                System.out.println(entry.getKey());
+//                int ind = nameList.indexOf(entry.getKey().getId());
+//                arrOfScore[ind] = entry.getValue();
+//                arrOfId[ind] = entry.getKey().getId();
+                stringScoreMap.put(entry.getKey().getId(), entry.getValue());
+                ind++;
+            }
+//            DataVector vec = new DataVector(arrOfScore);
+//            DataVector vec = new DataVector(stringScoreMap);
+            DataVector vec = new DataVector(clusterScoreMap.get(comNodeClustToFlatClust.get(arrCluster[i])));
+            
+            vec.nodeRef = comNodeClustToFlatClust.get(arrCluster[i]);
+            vec.comNodeClusterRef = arrCluster[i];
+            
+            kCluster.dataVectorList.add(vec);
+//            vec.setNameList(arrOfId);
+                
+        }
+        StopWatch sw = new StopWatch();
+        sw.start();
+        kCluster.assignKPoint();
+        sw.stop();
+        System.out.println("Time used for assigning K points: "+sw);
+        sw.start();
+        kCluster.cluster();
+        sw.stop();
+        System.out.println("Time used for clustering: "+sw);
+
+        return kCluster.getClusterList();
+        
+    }
+    /*unused now*/
+    private static void collectGOScoreMap(final Set<Object> cluster,Map<GOTerm,Double> GOIDMap){
+        Set sortedSet = new TreeSet(new Comparator<Entry<GOTerm,Double>>() {
+                
+//                public int compare(Entry<String, ArrayList> o1, Entry<String, ArrayList> o2) {
+//                    double score1 = 0, score2 = 0;
+////                    double proportion = (double)((Double)o1.getValue().get(0))/cluster.size();
+//                    double proportion = (Double)o1.getValue().get(0);
+//                    score1 = (double)proportion * (Integer)o1.getValue().get(1);
+////                    proportion = (double)((Double)o2.getValue().get(0))/cluster.size();
+//                    proportion = (Double)o2.getValue().get(0);
+//                    score2 = (double) proportion * (Integer)o2.getValue().get(1);
+//                    if (score1 > score2)
+//                        return -1;
+//                    else if (score1 == score2)
+//                        return 0;
+//                    else 
+//                        return 1;
+//                    
+//                }
+
+            public int compare(Entry<GOTerm, Double> o1, Entry<GOTerm, Double> o2) {
+                    double score1 = 0, score2 = 0;
+//                    double proportion = (double)((Double)o1.getValue().get(0))/cluster.size();
+//                    double proportion = (Double)o1.getValue();
+                    score1 = (Double)o1.getValue();//(double)proportion * (Integer)o1.getKey().getDepth();
+//                    proportion = (double)((Double)o2.getValue().get(0))/cluster.size();
+//                    proportion = (Double)o2.getValue();
+                    score2 = (Double)o2.getValue();// proportion * (Integer)o2.getKey().getDepth();
+                    if (score1 > score2)
+                        return -1;
+                    else if (score1 == score2)
+                        return 0;
+                    else 
+                        return 1;
+                
+            }
+            });
+        sortedSet.addAll(GOIDMap.entrySet());
+//        ArrayList<Entry<String, ArrayList>> GOSet = new ArrayList<Entry<String, ArrayList>>();
+        ArrayList<Entry<GOTerm, Double>> GOSet = new ArrayList<Entry<GOTerm, Double>>();
+//        ArrayList<Entry<GOTerm, Double>> GOSet2 = new ArrayList<Entry<GOTerm, Double>>();
+//        GOSet.addAll(sortedSet);
+//        int i = 0;
+        System.out.println("sorted set: "+sortedSet.size());
+        for (Object e : sortedSet){
+            GOSet.add((Entry) e);
+            Entry entry = (Entry) e;
+            
+//            GOSet2.add(entry);
+            System.out.println(entry.getKey()+" "+entry.getValue());
+//            i++;
+//            if (i == 5) 
+//                break;
+        }
+//        System.out.println("GO Set: "+GOSet);
+//        clusterScoreMap.put(cluster, GOSet);
+    }
+    /*unused now*/
+    private static void collectGOMembersMap(final Set<Object> cluster,Map<GOTerm,Double> GOIDMap){
+//        ArrayList<Entry<String,ArrayList>> arrList = new ArrayList<String,ArrayList>();
+//        Set sortedSet = new TreeSet(new Comparator<Entry<String,ArrayList>>() {
+        
+//        Map sortedMap = new TreeMap<GOTerm,Double>(c);
+//        (new Comparator<GOTerm>() {
+//
+//            public int compare(Entry<GOTerm, Double> o1, Entry<GOTerm, Double> o2) {
+//                double score1 = 0, score2 = 0;
+////                    double proportion = (double)((Double)o1.getValue().get(0))/cluster.size();
+//                double proportion = (Double) o1.getValue();
+//                score1 = (double) proportion * (Integer) o1.getKey().getDepth();
+////                    proportion = (double)((Double)o2.getValue().get(0))/cluster.size();
+//                proportion = (Double) o2.getValue();
+//                score2 = (double) proportion * (Integer) o2.getKey().getDepth();
+//                if (score1 > score2) {
+//                    return -1;
+//                } else if (score1 == score2) {
+//                    return 0;
+//                } else {
+//                    return 1;
+//                }
+//            }
+//
+//            public int compare(GOTerm o1, GOTerm o2) {
+//                
+//                throw new UnsupportedOperationException("Not supported yet.");
+//            }
+//           
+//        });
+         Set sortedSet = new TreeSet(new Comparator<Entry<GOTerm,Double>>() {
+                
+
+            public int compare(Entry<GOTerm, Double> o1, Entry<GOTerm, Double> o2) {
+                    double score1 = 0, score2 = 0;
+//                    double proportion = (double)((Double)o1.getValue().get(0))/cluster.size();
+                    double proportion = (Double)o1.getValue();
+                    score1 = (double)proportion * (Integer)o1.getKey().getDepth();
+//                    proportion = (double)((Double)o2.getValue().get(0))/cluster.size();
+                    proportion = (Double)o2.getValue();
+                    score2 = (double) proportion * (Integer)o2.getKey().getDepth();
+                    if (score1 > score2)
+                        return -1;
+                    else if (score1 == score2)
+                        return 0;
+                    else 
+                        return 1;
+                
+            }
+            });
+        sortedSet.addAll(GOIDMap.entrySet());
+//        sortedMap.putAll(GOIDMap);
+//        ArrayList<Entry<String, ArrayList>> GOSet = new ArrayList<Entry<String, ArrayList>>();
+        ArrayList<Entry<GOTerm, Double>> GOSet = new ArrayList<Entry<GOTerm, Double>>();
+        
+//        ArrayList<Entry<GOTerm, Double>> GOSet2 = new ArrayList<Entry<GOTerm, Double>>();
+//        GOSet.addAll(sortedSet);
+        int i = 0;
+        System.out.println("sorted set: "+sortedSet.size());
+        for (Object e : sortedSet){
+            GOSet.add((Entry) e);
+            Entry entry = (Entry) e;
+            
+//            GOSet2.add(entry);
+            System.out.println(entry.getKey()+" "+((GOTerm)entry.getKey()).getDepth()+" "+entry.getValue());
+            
+//            i++;
+//            if (i == 5) 
+//                break;
+        }
+        
+        
+//        System.out.println("GO Set: "+GOSet);
+//        clusterNumMemMap.put(cluster, GOSet);
+//        clusterNumMemMap.put(cluster, sortedMap);
+    }
+    
+    public static OBOSession getSession(String path) throws IOException, OBOParseException {
+        
+	DefaultOBOParser parser = new DefaultOBOParser();
+	OBOParseEngine engine = new OBOParseEngine(parser);
+	// GOBOParseEngine can parse several files at once
+	// and create one munged-together ontology,
+	// so we need to provide a Collection to the setPaths() method
+	Collection paths = new LinkedList();
+	paths.add(path);
+	engine.setPaths(paths);
+	engine.parse();
+	session = parser.getSession();
+	return session;
+    }
+    public static void createClusterCommonGOSet(Set<Set<Object>> cSet) {
+        System.out.println("\nCalculate GO Stat\n");
+        for (Set<Object> cluster : cSet) {
+            Set commonGOId = new HashSet();
+            int i = 0;
+            String name = "";
+            for (Object node : cluster) {
+                BioObject bioNode = (BioObject) node;
+                if (i == 0) {
+                    commonGOId.addAll(bioNode.getGoIdList());
+                    name = bioNode.toString();
+                } else {
+                    commonGOId.retainAll(bioNode.getGoIdList());
+                }
+                i++;
+            }
+            System.out.println("Num Common GO Id for cluster of " + name + " with size " + cluster.size() + ": " + commonGOId.size() + " List: " + commonGOId);
+        }
+    }
+    public static void main(String[] args) throws FileNotFoundException, IOException {
+//        try {
+//            loadGOTermsMap();
+//            
+//        } catch (FileNotFoundException ex) {
+//            Logger.getLogger(GOProcessor.class.getName()).log(Level.SEVERE, null, ex);
+//        } catch (IOException ex) {
+//            Logger.getLogger(GOProcessor.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//        Set s1 = new HashSet();Set s2 = new HashSet();Set s3 = new HashSet();
+//        s2.add(1); s2.add(2); s3.add(3); s3.add(4);
+//        s1.addAll(s2); s1.addAll(s3);
+//        Set ss1 = new HashSet(); Set ss2 = new HashSet();
+//        ss1.addAll(s1);
+//        System.out.println("ss1" +ss1);
+//        s1.clear();
+//        s1.add(s2); s1.add(s3);
+//        ss1.clear();
+//        ss1.add(s1);
+//        System.out.println("ss1" +ss1);
+        
+    }
+}

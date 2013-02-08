@@ -1,0 +1,972 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+/*
+ * MakeCustomGraphViewDialog.java
+ *
+ * Created on Jul 3, 2009, 4:14:35 PM
+ */
+package main;
+
+import edu.uci.ics.jung.graph.Graph;
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.TreeSet;
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.DefaultListModel;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.KeyStroke;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
+/**
+ *
+ * @author Knacky
+ */
+public class MakeCustomGraphViewDialog extends javax.swing.JDialog {
+
+    /** Creates new form MakeCustomGraphViewDialog */
+    public MakeCustomGraphViewDialog(java.awt.Frame parent, boolean modal) {
+        super(parent, modal);
+        initComponents();
+        this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+    }
+
+    public MakeCustomGraphViewDialog(java.awt.Frame parent, boolean modal, Graph dynamicGraph, Graph realGraph) {
+        this(parent, modal);
+        this.dynamicGraph = dynamicGraph;
+        this.realGraph = realGraph;
+        loadGraphData();
+    }
+
+    public Graph getDynamicGraph() {
+        return dynamicGraph;
+    }
+
+    public void setDynamicGraph(Graph dynamicGraph) {
+        this.dynamicGraph = dynamicGraph;
+    }
+
+    public Graph getRealGraph() {
+        return realGraph;
+    }
+
+    public void setRealGraph(Graph realGraph) {
+        this.realGraph = realGraph;
+    }
+
+    //compare by using standard name
+    private class BioObjectComparator implements Comparator<BioObject> {
+
+        public int compare(BioObject o1, BioObject o2) {
+            return o1.toString().compareToIgnoreCase(o2.toString());
+        }
+    }
+
+    public void loadGraphData() {
+
+
+        otherPrimEntSet.addAll(realGraph.getVertices());
+        for (Object ver : dynamicGraph.getVertices()) {
+            if (ver instanceof Set) {
+                primEntInViewSet.addAll((Set) ver);
+            } else if (ver instanceof BioObject) {
+                primEntSetToBeRemoved.add(ver);
+            }
+//            else
+//                primEntInViewSet.add(ver);
+            nodesInViewSet.add(ver);
+        }
+
+        nodesInViewLM = new DefaultListModel();
+        oriAllNodesInViewLM = new DefaultListModel();
+        nodesInViewLM.addElement("<html><b>All clusters/nodes in the current view: " + nodesInViewSet.size() + " clusters/nodes</b></html>");
+        for (Object ver : nodesInViewSet) {
+            nodesInViewLM.addElement(ver);
+//            oriAllNodesInViewLM.addElement(ver);
+        }
+        for (Enumeration e = nodesInViewLM.elements(); e.hasMoreElements();){
+            oriAllNodesInViewLM.addElement(e.nextElement());
+        }
+        allNodesInViewJList.setModel(nodesInViewLM);
+
+        primEntInViewLM = new DefaultListModel();
+        oriAllPrimEntInViewLM = new DefaultListModel();
+        primEntInViewLM.addElement("<html><b>All nodes contained in the clusters of the above list: " + primEntInViewSet.size() + " nodes</b></html>");
+        for (Object ver : primEntInViewSet) {
+            primEntInViewLM.addElement(ver);
+//            oriAllPrimEntInViewLM.addElement(ver);
+        }
+        for (Enumeration e = primEntInViewLM.elements(); e.hasMoreElements();){
+            oriAllPrimEntInViewLM.addElement(e.nextElement());
+        }
+        allPrimInViewJList.setModel(primEntInViewLM);
+
+        primEntInViewSetCopy.addAll(primEntInViewSet);
+        // remove all primitive entries which were in the clusters
+        otherPrimEntSet.removeAll(primEntInViewSet);
+        // remove all primitive entries in the current view which were not in the clusters
+        otherPrimEntSet.removeAll(primEntSetToBeRemoved);
+
+        primEntLM = new DefaultListModel();
+        oriAllPrimEntLM = new DefaultListModel();
+        primEntLM.removeAllElements();
+        primEntLM.addElement("<html><b>All other nodes not in this view: " + otherPrimEntSet.size() + " nodes</b></html>");
+        for (Object ver : otherPrimEntSet) {
+            primEntLM.addElement(ver);
+//            oriAllPrimEntLM.addElement(ver);
+        }
+        for (Enumeration e = primEntLM.elements(); e.hasMoreElements();){
+            oriAllPrimEntLM.addElement(e.nextElement());
+        }        
+        allOtherPrimJList.setModel(primEntLM);
+        
+        selectedNodesJList.setModel(selectedNodesLM);
+        selectedNodesLM.addElement("<html><b>Selected items: 0 items</b></html>");
+        oriSelectedNodesLM.addElement("<html><b>Selected items: 0 items</b></html>");
+
+    }
+
+    /** This method is called from within the constructor to
+     * initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is
+     * always regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        mainPanel = new javax.swing.JPanel();
+        jPanel3 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        jPanel5 = new javax.swing.JPanel();
+        jLabel5 = new javax.swing.JLabel();
+        searchBox = new javax.swing.JTextField();
+        jPanel6 = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
+        AddButton = new javax.swing.JButton();
+        RemoveButton = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        selectedNodesJList = new javax.swing.JList();
+        jSplitPane1 = new javax.swing.JSplitPane();
+        jSplitPane2 = new javax.swing.JSplitPane();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jTextArea3 = new javax.swing.JTextArea();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        allNodesInViewJList = new javax.swing.JList();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        allPrimInViewJList = new javax.swing.JList();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        jTextArea4 = new javax.swing.JTextArea();
+        jScrollPane6 = new javax.swing.JScrollPane();
+        allOtherPrimJList = new javax.swing.JList();
+        jPanel1 = new javax.swing.JPanel();
+        OKButton = new javax.swing.JButton();
+        CancelButton = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Make Custom Graph View");
+        setResizable(false);
+
+        jLabel2.setText("Select clusters/nodes from the left and press >> to move them to the right");
+
+        jLabel3.setText("If you don't need some clusters/nodes on the right panel, select them and press << to move them back");
+
+        jLabel4.setText("When you finish selection, press OK. Press Cancel to return to the main program");
+
+        org.jdesktop.layout.GroupLayout jPanel3Layout = new org.jdesktop.layout.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(jLabel2)
+                    .add(jLabel4)
+                    .add(jLabel3))
+                .addContainerGap(94, Short.MAX_VALUE))
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .add(jLabel2)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jLabel3)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jLabel4)
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jLabel5.setText("Search for a node (Press Esc to clear the box):");
+
+        searchBox.setText("Type name and press Enter");
+        searchBoxBg = searchBox.getBackground();
+        searchBox.getDocument().addDocumentListener(new SearchBoxDocListener());
+        InputMap im = searchBox.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        ActionMap am = searchBox.getActionMap();
+        im.put(KeyStroke.getKeyStroke("ESCAPE"), CANCEL_ACTION);
+        am.put(CANCEL_ACTION, new CancelAction());
+        searchBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                searchBoxActionPerformed(evt);
+            }
+        });
+        searchBox.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                removeDefaultText(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                insertDefaultText(evt);
+            }
+        });
+
+        org.jdesktop.layout.GroupLayout jPanel5Layout = new org.jdesktop.layout.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel5Layout.createSequentialGroup()
+                .add(jLabel5)
+                .add(18, 18, 18)
+                .add(searchBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 234, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(32, 32, 32))
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .add(jPanel5Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel5)
+                    .add(searchBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanel2.setLayout(new java.awt.GridLayout(2, 0));
+
+        AddButton.setText(">>");
+        AddButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                AddButtonActionPerformed(evt);
+            }
+        });
+        jPanel2.add(AddButton);
+
+        RemoveButton.setText("<<");
+        RemoveButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                RemoveButtonActionPerformed(evt);
+            }
+        });
+        jPanel2.add(RemoveButton);
+
+        jScrollPane1.setViewportView(selectedNodesJList);
+
+        jSplitPane1.setBorder(null);
+        jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        jSplitPane1.setResizeWeight(0.7);
+        jSplitPane1.setOneTouchExpandable(true);
+
+        jSplitPane2.setBorder(null);
+        jSplitPane2.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        jSplitPane2.setResizeWeight(0.5);
+        jSplitPane2.setOneTouchExpandable(true);
+
+        jTextArea3.setColumns(20);
+        jTextArea3.setRows(5);
+        jTextArea3.setBorder(null);
+        jScrollPane3.setViewportView(jTextArea3);
+
+        jSplitPane2.setRightComponent(jScrollPane3);
+
+        allNodesInViewJList.setModel(new javax.swing.AbstractListModel() {
+            String[] strings = { "<html><b>All clusters and nodes in the current view</b></html>" };
+            public int getSize() { return strings.length; }
+            public Object getElementAt(int i) { return strings[i]; }
+        });
+        jScrollPane2.setViewportView(allNodesInViewJList);
+
+        jSplitPane2.setLeftComponent(jScrollPane2);
+
+        allPrimInViewJList.setModel(new javax.swing.AbstractListModel() {
+            String[] strings = { "<html><b>All nodes in the current view</b></html>" };
+            public int getSize() { return strings.length; }
+            public Object getElementAt(int i) { return strings[i]; }
+        });
+        jScrollPane5.setViewportView(allPrimInViewJList);
+
+        jSplitPane2.setBottomComponent(jScrollPane5);
+
+        jSplitPane1.setLeftComponent(jSplitPane2);
+
+        jTextArea4.setColumns(20);
+        jTextArea4.setRows(5);
+        jTextArea4.setBorder(null);
+        jScrollPane4.setViewportView(jTextArea4);
+
+        jSplitPane1.setRightComponent(jScrollPane4);
+
+        allOtherPrimJList.setModel(new javax.swing.AbstractListModel() {
+            String[] strings = { "<html><b>All other nodes not in the current view</b></html>" };
+            public int getSize() { return strings.length; }
+            public Object getElementAt(int i) { return strings[i]; }
+        });
+        allOtherPrimJList.setName(""); // NOI18N
+        jScrollPane6.setViewportView(allOtherPrimJList);
+
+        jSplitPane1.setBottomComponent(jScrollPane6);
+
+        org.jdesktop.layout.GroupLayout jPanel6Layout = new org.jdesktop.layout.GroupLayout(jPanel6);
+        jPanel6.setLayout(jPanel6Layout);
+        jPanel6Layout.setHorizontalGroup(
+            jPanel6Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel6Layout.createSequentialGroup()
+                .add(jSplitPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 331, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 312, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel6Layout.setVerticalGroup(
+            jPanel6Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel6Layout.createSequentialGroup()
+                .addContainerGap()
+                .add(jPanel6Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE)
+                    .add(jSplitPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+
+        OKButton.setText("OK");
+        OKButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                OKButtonActionPerformed(evt);
+            }
+        });
+
+        CancelButton.setText("Cancel");
+        CancelButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CancelButtonActionPerformed(evt);
+            }
+        });
+
+        jLabel1.setText("Make a new view from the selected clusters/nodes?");
+
+        org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
+                .add(jLabel1)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 211, Short.MAX_VALUE)
+                .add(OKButton)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(CancelButton)
+                .add(47, 47, 47))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(CancelButton)
+                    .add(OKButton)
+                    .add(jLabel1))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        org.jdesktop.layout.GroupLayout mainPanelLayout = new org.jdesktop.layout.GroupLayout(mainPanel);
+        mainPanel.setLayout(mainPanelLayout);
+        mainPanelLayout.setHorizontalGroup(
+            mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(mainPanelLayout.createSequentialGroup()
+                .add(mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(mainPanelLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .add(jPanel5, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 570, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
+                        .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .add(org.jdesktop.layout.GroupLayout.LEADING, mainPanelLayout.createSequentialGroup()
+                            .addContainerGap()
+                            .add(mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .add(jPanel6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        mainPanelLayout.setVerticalGroup(
+            mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(mainPanelLayout.createSequentialGroup()
+                .add(jPanel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel5, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+        );
+
+        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(layout.createSequentialGroup()
+                .addContainerGap()
+                .add(mainPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .add(mainPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void CancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CancelButtonActionPerformed
+        this.setVisible(false);
+}//GEN-LAST:event_CancelButtonActionPerformed
+
+    private void OKButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OKButtonActionPerformed
+        //2011/10/6 Knack
+        if (selectedNodesLM.size() <= 1) {
+            answerOK = false;
+        } else {
+            answerOK = true;
+        }
+        this.setVisible(false);
+        selectedNodesLM.remove(0);
+        selectedNodeSet = new HashSet(Arrays.asList(selectedNodesLM.toArray()));
+    }//GEN-LAST:event_OKButtonActionPerformed
+
+    private void RemoveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RemoveButtonActionPerformed
+
+        int selectedIndArr[];
+        int start = 0;
+        selectedIndArr = selectedNodesJList.getSelectedIndices();
+        start = 0;
+        if (selectedIndArr.length > 0) {
+            //        System.out.println("selectedIndArr[0] "+selectedIndArr[0]);
+            if (selectedIndArr[0] == 0) {
+                start = 1;
+            }
+
+            for (int i = start; i < selectedIndArr.length; i++) {
+                Object item = selectedNodesLM.elementAt(selectedIndArr[i] - (i - start));
+                if (dynamicGraph.containsVertex(item)) {
+                    System.out.println("contain " + item);
+                    nodesInViewSet.add(item);
+                } else if (primEntInViewSetCopy.contains(item)) {
+                    primEntInViewSet.add(item);
+                } else {
+                    otherPrimEntSet.add(item);
+                }
+                //            System.out.println("selectedIndArr[i] "+selectedIndArr[i]);
+
+                //            System.out.println("element at "+allPrimEntLM.elementAt(selectedIndArr[i]-(i-start)));
+                //                selectedNodesLM.addElement(allPrimEntLM.elementAt(selectedIndArr[i] - (i - start)));
+                selectedNodesLM.removeElementAt(selectedIndArr[i] - (i - start));
+            }
+
+            selectedNodesJList.clearSelection();
+            selectedNodesLM.set(0, "<html><b>Selected items: " + (selectedNodesLM.size() - 1) + " items</b></html>");
+
+            if (nodesInViewLM.size() > 1) {
+                nodesInViewLM.removeRange(1, nodesInViewLM.getSize() - 1);
+            }
+            for (Object ver : nodesInViewSet) {
+                nodesInViewLM.addElement(ver);
+            }
+            System.out.println("size all node in view set: " + nodesInViewSet.size());
+            System.out.println("size all node in view LM: " + (nodesInViewLM.size() - 1));
+            nodesInViewLM.set(0, "<html><b>All nodes in the current view: " + (nodesInViewSet.size()) + " nodes</b></html>");
+
+            if (primEntInViewLM.size() > 1) {
+                primEntInViewLM.removeRange(1, primEntInViewLM.getSize() - 1);
+            }
+            for (Object ver : primEntInViewSet) {
+                primEntInViewLM.addElement(ver);
+            }
+            primEntInViewLM.set(0, "<html><b>All nodes contained in the clusters of the above list: " + (primEntInViewSet.size()) + " nodes</b></html>");
+
+            if (primEntLM.size() > 1) {
+                primEntLM.removeRange(1, primEntLM.getSize() - 1);
+            }
+            for (Object ver : otherPrimEntSet) {
+                primEntLM.addElement(ver);
+            }
+            primEntLM.set(0, "<html><b>All other nodes not in this view: " + (otherPrimEntSet.size()) + " nodes</b></html>");
+
+        }
+
+    }//GEN-LAST:event_RemoveButtonActionPerformed
+
+    private void AddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AddButtonActionPerformed
+
+
+        int selectedIndArr[];
+        int start = 0;
+
+        /* process all nodes JList */
+        selectedIndArr = allNodesInViewJList.getSelectedIndices();
+        System.out.println("selectedIndArr size " + selectedIndArr.length);
+        Set entitiesInMetanodesOfThisViewSet = new HashSet();
+        if (selectedIndArr.length > 0) {
+            start = 0;
+            System.out.println("selectedIndArr[0] " + selectedIndArr[0]);
+            // remove the first row, which is a description text
+            if (selectedIndArr[0] == 0) {
+                start = 1;
+            }
+
+            for (int i = start; i < selectedIndArr.length; i++) {
+                System.out.println("selectedIndArr[i] " + selectedIndArr[i]);
+                Object item = nodesInViewLM.elementAt(selectedIndArr[i] - (i - start));
+
+                System.out.println("item " + item);
+                selectedNodesLM.addElement(item);
+                nodesInViewSet.remove(item);
+                nodesInViewLM.removeElementAt(selectedIndArr[i] - (i - start));
+
+            }
+            allNodesInViewJList.clearSelection();
+            System.out.println("size of all node inview set " + nodesInViewSet.size());
+            nodesInViewLM.set(0, "<html><b>All nodes in the current view: " + (nodesInViewLM.size() - 1) + " nodes</b></html>");
+        }
+
+
+        for (Object member : selectedNodesLM.toArray()) {
+            if (member instanceof Set) {
+                entitiesInMetanodesOfThisViewSet.addAll((Set) member);
+            }
+        }
+        /* process entities in metanode JList */
+        // skip used to not redundantly add nodes which are already included in a cluster which is in turn also added
+        int skip = 0;
+        selectedIndArr = allPrimInViewJList.getSelectedIndices();
+        //        System.out.println("selectedIndArr size "+selectedIndArr.length);
+        if (selectedIndArr.length > 0) {
+            start = 0;
+            //            System.out.println("selectedIndArr[0] " + selectedIndArr[0]);
+            if (selectedIndArr[0] == 0) {
+                start = 1;
+            }
+
+            for (int i = start; i < selectedIndArr.length; i++) {
+                //                System.out.println("selectedIndArr[i] " + selectedIndArr[i]);
+                //                System.out.println("element at " + allPrimEntInViewLM.elementAt(selectedIndArr[i] - (i - start) + skip));
+                if (entitiesInMetanodesOfThisViewSet.contains(primEntInViewLM.elementAt(selectedIndArr[i] - (i - start) + skip))) {
+                    skip++;
+
+                } else {
+
+                    selectedNodesLM.addElement(primEntInViewLM.elementAt(selectedIndArr[i] - (i - start) + skip));
+                    primEntInViewSet.remove(primEntInViewLM.elementAt(selectedIndArr[i] - (i - start) + skip));
+                    primEntInViewLM.removeElementAt(selectedIndArr[i] - (i - start) + skip);
+
+                }
+            }
+            allPrimInViewJList.clearSelection();
+            primEntInViewLM.set(0, "<html><b>All nodes contained in the clusters of the above list: " + (primEntInViewLM.size() - 1) + " nodes</b></html>");
+
+        }
+
+
+        /* process all entities jList */
+
+        selectedIndArr = allOtherPrimJList.getSelectedIndices();
+        start = 0;
+        if (selectedIndArr.length > 0) {
+            //        System.out.println("selectedIndArr[0] "+selectedIndArr[0]);
+            if (selectedIndArr[0] == 0) {
+                start = 1;
+            }
+
+            for (int i = start; i < selectedIndArr.length; i++) {
+                //            System.out.println("selectedIndArr[i] "+selectedIndArr[i]);
+
+                //            System.out.println("element at "+allPrimEntLM.elementAt(selectedIndArr[i]-(i-start)));
+                selectedNodesLM.addElement(primEntLM.elementAt(selectedIndArr[i] - (i - start)));
+                otherPrimEntSet.remove(primEntLM.elementAt(selectedIndArr[i] - (i - start)));
+                primEntLM.removeElementAt(selectedIndArr[i] - (i - start));
+
+            }
+
+            allOtherPrimJList.clearSelection();
+            primEntLM.set(0, "<html><b>All other nodes not in this view: " + (primEntLM.size() - 1) + " nodes</b></html>");
+        }
+        selectedNodesLM.set(0, "<html><b>Selected items: " + (selectedNodesLM.size() - 1) + " items</b></html>");
+}//GEN-LAST:event_AddButtonActionPerformed
+
+    private void searchBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchBoxActionPerformed
+        // TODO add your handling code here:
+}//GEN-LAST:event_searchBoxActionPerformed
+
+    private int removeTextCounter = 0;
+    private void removeDefaultText(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_removeDefaultText
+//        if (removeTextCounter > 0)
+//            searchBox.setText("");
+//        removeTextCounter++;
+    }//GEN-LAST:event_removeDefaultText
+
+    private void insertDefaultText(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_insertDefaultText
+        // TODO add your handling code here:
+//        if (searchBox.getText().isEmpty()) {
+//            searchBox.setText("Type name and press Enter");
+//            searchBox.setBackground(searchBoxBg);
+//        }
+    }//GEN-LAST:event_insertDefaultText
+
+    public boolean isAnswerOK() {
+        return answerOK;
+    }
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        java.awt.EventQueue.invokeLater(new Runnable() {
+
+            public void run() {
+                MakeCustomGraphViewDialog dialog = new MakeCustomGraphViewDialog(new javax.swing.JFrame(), true);
+                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+
+                    public void windowClosing(java.awt.event.WindowEvent e) {
+                        System.exit(0);
+                    }
+                });
+                dialog.setVisible(true);
+            }
+        });
+    }
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton AddButton;
+    private javax.swing.JButton CancelButton;
+    private javax.swing.JButton OKButton;
+    private javax.swing.JButton RemoveButton;
+    private javax.swing.JList allNodesInViewJList;
+    private javax.swing.JList allOtherPrimJList;
+    private javax.swing.JList allPrimInViewJList;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
+    private javax.swing.JScrollPane jScrollPane6;
+    private javax.swing.JSplitPane jSplitPane1;
+    private javax.swing.JSplitPane jSplitPane2;
+    private javax.swing.JTextArea jTextArea3;
+    private javax.swing.JTextArea jTextArea4;
+    private javax.swing.JPanel mainPanel;
+    private javax.swing.JTextField searchBox;
+    private javax.swing.JList selectedNodesJList;
+    // End of variables declaration//GEN-END:variables
+    private Graph dynamicGraph;
+    private Graph realGraph;
+    private DefaultListModel primEntLM;
+    private DefaultListModel oriAllPrimEntLM;
+    private DefaultListModel nodesInViewLM;
+    private DefaultListModel oriAllNodesInViewLM;
+    private DefaultListModel primEntInViewLM;
+    private DefaultListModel oriAllPrimEntInViewLM;
+    private DefaultListModel selectedNodesLM = new DefaultListModel();
+    private DefaultListModel oriSelectedNodesLM = new DefaultListModel();
+    private Set primEntInViewSet = new TreeSet(new BioObjectComparator());
+    private Set primEntSetToBeRemoved = new TreeSet(new BioObjectComparator());
+    private Set primEntInViewSetCopy = new TreeSet(new BioObjectComparator());
+
+    class NodeClusterComparator implements Comparator {
+
+        @Override
+        public int compare(Object o1, Object o2) {
+            if (o1 instanceof BioObject && o2 instanceof BioObject) {
+                return o1.toString().compareToIgnoreCase(o2.toString());
+            } else if (o1 instanceof Set && o2 instanceof Set) {
+                if (((Set) o1).size() < ((Set) o2).size()) {
+                    return -1;
+                } else if (((Set) o1).size() > ((Set) o2).size()) {
+                    return 1;
+                } else {
+                    if (((Set) o1).isEmpty()) {
+                        return 0;
+                    }
+                    return ((Set) o1).iterator().next().toString().compareToIgnoreCase(((Set) o2).iterator().next().toString());
+//                        return 0;
+                }
+
+            } else {
+                if ((o1 instanceof BioObject) && (o2 instanceof Set)) {
+                    return -1;
+                } else if ((o1 instanceof Set) && (o2 instanceof BioObject)) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }
+
+        }
+    }
+    private Set nodesInViewSet = new TreeSet(new NodeClusterComparator());
+    private Set otherPrimEntSet = new TreeSet(new BioObjectComparator());
+    private boolean answerOK = false;
+    private Set selectedNodeSet = new HashSet();
+    final Color ERROR_COLOR = Color.PINK;
+    Color searchBoxBg;
+    final static String CANCEL_ACTION = "cancel-search";
+
+    public Set getSelectedNodeSet() {
+        return selectedNodeSet;
+    }
+
+    class CancelAction extends AbstractAction {
+
+        @Override
+        public void actionPerformed(ActionEvent ev) {
+//            hilit.removeAllHighlights();
+            searchBox.setText("");
+            searchBox.setBackground(searchBoxBg);
+        }
+    }
+
+    class SearchBoxDocListener implements DocumentListener {
+
+        public void search() {
+//            hilit.removeAllHighlights();
+
+            /* clear all lists and populate all entities that are not selected */
+            String s = searchBox.getText();
+            
+            if (s.length() <= 0) {
+//                message("Nothing to search");
+                searchBox.setText("");
+                searchBox.setBackground(searchBoxBg);
+
+//        nodesInViewLM.clear();
+                nodesInViewLM = new DefaultListModel();
+                for (Object o : nodesInViewSet) {
+                    nodesInViewLM.addElement(o);
+                }
+                nodesInViewLM.insertElementAt("<html><b>All clusters/nodes in the current view: " + nodesInViewLM.size() + " clusters/nodes</b></html>", 0);
+                allNodesInViewJList.setModel(nodesInViewLM);
+
+                primEntInViewLM = new DefaultListModel();
+//        primEntInViewLM.clear();
+                for (Object o : primEntInViewSet) {
+                    primEntInViewLM.addElement(o);
+                }
+                primEntInViewLM.insertElementAt("<html><b>All nodes contained in the clusters of the above list: " + primEntInViewLM.size() + " nodes</b></html>", 0);
+                allPrimInViewJList.setModel(primEntInViewLM);
+
+//        primEntLM.clear();
+                primEntLM = new DefaultListModel();
+                for (Object o : otherPrimEntSet) {
+                    primEntLM.addElement(o);
+                }
+                primEntLM.insertElementAt("<html><b>All other nodes not in this view: " + primEntLM.size() + " nodes</b></html>", 0);
+                allOtherPrimJList.setModel(primEntLM);
+                
+                return;
+            }
+            
+            /* filter only nodes whose names start with the search name */
+            /* all nodes and clusters in the current view */
+            Set filteredAllNodesInViewSet = new TreeSet(new NodeClusterComparator());
+//            System.out.println("nodesInViewSet "+nodesInViewSet.size());
+            for (Object obj : nodesInViewSet) {
+                if (obj instanceof BioObject) {
+                    BioObject bioObj = (BioObject) obj;
+                    if (bioObj.getName().toUpperCase().startsWith(s.toUpperCase()) || (bioObj.getStandardName().toUpperCase().startsWith(s.toUpperCase()))
+                            || (bioObj.getObjName().toUpperCase().startsWith(s.toUpperCase()))) {
+                        filteredAllNodesInViewSet.add(bioObj);
+                    } else {
+                        
+                        for (String st : bioObj.getSynonym()) {
+                            if (st.toUpperCase().startsWith(s.toUpperCase())) {
+                                filteredAllNodesInViewSet.add(bioObj);
+                                break;
+                            }
+                        }
+                        
+                    }
+                } else if (obj instanceof Set) {
+                    Set set = (Set) obj;
+                    for (Object element : set) {
+                        if (element instanceof BioObject) {
+                            BioObject bioObj = (BioObject) element;
+                            if (bioObj.getName().toUpperCase().startsWith(s.toUpperCase()) || (bioObj.getStandardName().toUpperCase().startsWith(s.toUpperCase()))
+                                    || (bioObj.getObjName().toUpperCase().startsWith(s.toUpperCase()))) {
+                                filteredAllNodesInViewSet.add(set);
+                                break;
+                            } else {
+                                boolean br = false;
+                                for (String st : bioObj.getSynonym()) {
+                                    if (st.toUpperCase().startsWith(s.toUpperCase())) {
+                                        filteredAllNodesInViewSet.add(set);
+                                        br = true;
+                                    }
+                                }
+                                if (br)
+                                {
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+//            System.out.println("filteredAllNodesInViewSet "+filteredAllNodesInViewSet.size());
+//            System.out.println("primEntInViewSet "+primEntInViewSet.size());
+            /* all primitive entities in the current view */
+            Set filteredPrimEntInViewSet = new TreeSet(new NodeClusterComparator());
+            for (Object obj : primEntInViewSet) {
+                if (obj instanceof BioObject) {
+                    BioObject bioObj = (BioObject) obj;
+                    if (bioObj.getName().toUpperCase().startsWith(s.toUpperCase()) || (bioObj.getStandardName().toUpperCase().startsWith(s.toUpperCase()))
+                            || (bioObj.getObjName().toUpperCase().startsWith(s.toUpperCase()))) {
+                        filteredPrimEntInViewSet.add(bioObj);
+                    } else {
+                        for (String st : bioObj.getSynonym()) {
+                            if (st.toUpperCase().startsWith(s.toUpperCase())) {
+                                filteredPrimEntInViewSet.add(bioObj);
+                                break;
+                            }
+                        }
+                    }
+                }
+
+            }
+//            System.out.println("filteredPrimEntInViewSet "+filteredPrimEntInViewSet.size());
+//            System.out.println("otherPrimEntSet "+otherPrimEntSet.size());
+            /* all primitive entities in the graph */
+            Set filteredAllPrimEntSet = new TreeSet(new NodeClusterComparator());
+            for (Object obj : otherPrimEntSet) {
+                if (obj instanceof BioObject) {
+                    BioObject bioObj = (BioObject) obj;
+                    if (bioObj.getName().toUpperCase().startsWith(s.toUpperCase()) || (bioObj.getStandardName().toUpperCase().startsWith(s.toUpperCase()))
+                            || (bioObj.getObjName().toUpperCase().startsWith(s.toUpperCase()))) {
+                        filteredAllPrimEntSet.add(bioObj);
+                    } else {
+                        for (String st : bioObj.getSynonym()) {
+                            if (st.toUpperCase().startsWith(s.toUpperCase())) {
+                                filteredAllPrimEntSet.add(bioObj);
+                                break;
+                            }
+                        }
+                    }
+                } 
+
+            }
+//            System.out.println("filteredAllPrimEntSet "+filteredAllPrimEntSet.size());
+            
+            /* update the three lists */
+            if (filteredAllNodesInViewSet.isEmpty() && filteredAllPrimEntSet.isEmpty() && filteredPrimEntInViewSet.isEmpty()){
+//                System.out.println("all empty");
+                searchBox.setBackground(ERROR_COLOR);
+            } else {
+                nodesInViewLM = new DefaultListModel();
+                if (!filteredAllNodesInViewSet.isEmpty()) {
+
+
+                    for (Object o : filteredAllNodesInViewSet) {
+                        nodesInViewLM.addElement(o);
+                    }
+//                    System.out.println("filteredAllNodesInViewSet not empty");
+//                    System.out.println("nodesInViewLM "+filteredAllNodesInViewSet.size());
+//                allNodesInViewJList.updateUI();
+//                allNodesInViewJList.setModel();
+                }
+                nodesInViewLM.insertElementAt("<html><b>All clusters/nodes in the current view: " + nodesInViewLM.size() + " clusters/nodes</b></html>", 0);
+                allNodesInViewJList.setModel(nodesInViewLM);
+
+//                primEntInViewLM.clear();
+                primEntInViewLM = new DefaultListModel();
+                if (!filteredPrimEntInViewSet.isEmpty()) {
+                    
+                    for (Object o : filteredPrimEntInViewSet) {
+                        primEntInViewLM.addElement(o);
+                    }
+//                    System.out.println("filteredPrimEntInViewSet not empty");
+//                    System.out.println("primEntInViewLM "+filteredPrimEntInViewSet.size());
+                }
+                primEntInViewLM.insertElementAt("<html><b>All nodes contained in the clusters of the above list: " + primEntInViewLM.size() + " nodes</b></html>", 0);
+                allPrimInViewJList.setModel(primEntInViewLM);
+
+//                primEntLM.clear();
+                primEntLM = new DefaultListModel();
+                if (!filteredAllPrimEntSet.isEmpty()) {
+
+                    for (Object o : filteredAllPrimEntSet) {
+                        primEntLM.addElement(o);
+                    }
+//                    System.out.println("filteredAllPrimEntSet not empty");
+//                    System.out.println("primEntLM "+filteredAllPrimEntSet.size());
+                }
+                primEntLM.insertElementAt("<html><b>All other nodes not in this view: " + primEntLM.size() + " nodes</b></html>", 0);
+                allOtherPrimJList.setModel(primEntLM);
+
+            }
+            
+
+            /*
+             * deal with searching the three JLists 
+             * filter the Jlists 
+             */
+//            String content = textArea.getText();
+//            int index = content.indexOf(s, 0);
+//            if (index >= 0) {   // match found
+//                try {
+//                    int end = index + s.length();
+////                    hilit.addHighlight(index, end, painter);
+////                    textArea.setCaretPosition(end);
+//                    searchBox.setBackground(searchBoxBg);
+////                    message("'" + s + "' found. Press ESC to end search");
+//                } catch (BadLocationException e) {
+//                    e.printStackTrace();
+//                }
+//            } else {
+//                searchBox.setBackground(ERROR_COLOR);
+////                message("'" + s + "' not found. Press ESC to start a new search");
+//            }
+        }
+
+        @Override
+        public void insertUpdate(DocumentEvent ev) {
+            search();
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent ev) {
+            search();
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent ev) {
+        }
+    }
+}

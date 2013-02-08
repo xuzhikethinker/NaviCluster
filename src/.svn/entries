@@ -1,0 +1,53 @@
+10
+
+dir
+32
+https://takagilab.cb.k.u-tokyo.ac.jp/svn/repos/trunk/src
+https://takagilab.cb.k.u-tokyo.ac.jp/svn/repos
+
+
+
+2009-09-15T11:52:19.147061Z
+31
+nalapro01
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+41c5a7f8-2931-4610-8c64-9b6ca5e0e7aa
+
+main
+dir
+
+LouvainAlgorithm
+dir
+
+
+
+add
+
+datasets
+dir
+
+fromjungsource
+dir
+
+kmean
+dir
+
+util
+dir
+
+examples
+dir
+

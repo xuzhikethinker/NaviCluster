@@ -1,0 +1,119 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package main;
+
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+ * 2009/11/2    Add "parents" field and its corresponding methods
+ *              Add equal and hashcode methods
+ *              Make all fields "private"
+ *
+ * @author Knacky
+ */
+public class GOTerm extends Object{
+    private String id = "";
+    private String name = "";
+    private int depth = 0;
+    private NameSpace namespace = NameSpace.ALL;
+    private Set<String> parents = new HashSet<String>();
+
+    public NameSpace getNamespace() {
+        return namespace;
+    }
+
+    public void setNamespace(NameSpace namespace) {
+        this.namespace = namespace;
+    }
+    
+    public int getDepth() {
+        return depth;
+    }
+
+    public void setDepth(int depth) {
+        this.depth = depth;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Set<String> getParents() {
+        return parents;
+    }
+
+    public void setParents(Set<String> parents) {
+        this.parents = parents;
+    }
+
+    public void addParent(String parent){
+        this.parents.add(parent);
+    }
+
+    public void removeParent(GOTerm parent){
+        this.parents.remove(parent);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final GOTerm other = (GOTerm) obj;
+        if ((this.id == null) ? (other.id != null) : !this.id.equals(other.id)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 23 * hash + (this.id != null ? this.id.hashCode() : 0);
+        return hash;
+    }
+
+
+
+    public GOTerm(String id){
+        this.id = id;
+    }
+    public GOTerm(String id, int depth){
+        this.id = id;
+        this.depth = depth;
+    }
+    public GOTerm(){
+        
+    }
+    @Override
+    public String toString(){
+        return id;
+    }
+    
+    public static GOTerm findGO(Set<GOTerm> GOSet, String id){
+        for (GOTerm term : GOSet){
+            if (id.equals(term.id))
+                return term;
+        }
+        return null;
+    }
+}

@@ -1,0 +1,15 @@
+Time used for loading from input file: Time Used: 0 hour(s) 0 minute(s) 2 second(s) OR elapsedTimeMillis: 2191
+After Louvain Clustering
+Start process raw cluster set!
+After processing LC
+Start property-based clustering!
+Start transform data cluster to real clusters...
+End transform data cluster to real clusters...
+End property-based clustering!
+Prop Term Processor clusterScoreMap size: 15
+Time to create vertices Time Used: 0 hour(s) 0 minute(s) 0 second(s) OR elapsedTimeMillis: 4
+Time to create property edges Time Used: 0 hour(s) 0 minute(s) 0 second(s) OR elapsedTimeMillis: 222
+Time to create metaedges Time Used: 0 hour(s) 0 minute(s) 0 second(s) OR elapsedTimeMillis: 299
+Time to add metaedges to the graph Time Used: 0 hour(s) 0 minute(s) 0 second(s) OR elapsedTimeMillis: 46
+Time used for creating graph from cSet: Time Used: 0 hour(s) 0 minute(s) 0 second(s) OR elapsedTimeMillis: 585
+Time used for multi-step layout: Time Used: 0 hour(s) 0 minute(s) 0 second(s) OR elapsedTimeMillis: 210

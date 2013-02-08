@@ -1,0 +1,101 @@
+K 25
+svn:wc:ra_dav:version-url
+V 37
+/svn/repos/!svn/ver/31/trunk/src/util
+END
+GOFileHandler.java
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/repos/!svn/ver/36/trunk/src/util/GOFileHandler.java
+END
+SGDDataHandler.java
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/repos/!svn/ver/36/trunk/src/util/SGDDataHandler.java
+END
+CheckReplication.java
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/repos/!svn/ver/31/trunk/src/util/CheckReplication.java
+END
+OBOFileConverter.java
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/repos/!svn/ver/36/trunk/src/util/OBOFileConverter.java
+END
+StopWatch.java
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/repos/!svn/ver/31/trunk/src/util/StopWatch.java
+END
+LengthFunctionBySize.java
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/repos/!svn/ver/31/trunk/src/util/LengthFunctionBySize.java
+END
+TabToPajekParser.java.txt
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/repos/!svn/ver/31/trunk/src/util/TabToPajekParser.java.txt
+END
+ModSpringLayout1.java
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/repos/!svn/ver/31/trunk/src/util/ModSpringLayout1.java
+END
+ModSpringLayout2.java
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/repos/!svn/ver/31/trunk/src/util/ModSpringLayout2.java
+END
+SIFToModNetConverter.java
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/repos/!svn/ver/36/trunk/src/util/SIFToModNetConverter.java
+END
+InputFileLoader.java
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/repos/!svn/ver/31/trunk/src/util/InputFileLoader.java
+END
+LouvainToPajekParser.java.txt
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/repos/!svn/ver/31/trunk/src/util/LouvainToPajekParser.java.txt
+END
+AttedDataHandler.java
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/repos/!svn/ver/31/trunk/src/util/AttedDataHandler.java
+END
+GMLParser.java
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/repos/!svn/ver/31/trunk/src/util/GMLParser.java
+END
+TestOBOParser.java
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/repos/!svn/ver/31/trunk/src/util/TestOBOParser.java
+END
+GenLouvainFormat.java.txt
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/repos/!svn/ver/31/trunk/src/util/GenLouvainFormat.java.txt
+END

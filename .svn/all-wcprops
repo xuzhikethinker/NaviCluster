@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 28
+/svn/repos/!svn/ver/31/trunk
+END
+output-log
+K 25
+svn:wc:ra_dav:version-url
+V 39
+/svn/repos/!svn/ver/38/trunk/output-log
+END
+manifest.mf
+K 25
+svn:wc:ra_dav:version-url
+V 40
+/svn/repos/!svn/ver/31/trunk/manifest.mf
+END
+build.xml
+K 25
+svn:wc:ra_dav:version-url
+V 38
+/svn/repos/!svn/ver/38/trunk/build.xml
+END

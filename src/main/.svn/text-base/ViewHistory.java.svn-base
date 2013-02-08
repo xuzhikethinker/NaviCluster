@@ -1,0 +1,206 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package main;
+
+import edu.uci.ics.jung.algorithms.layout.Layout;
+import edu.uci.ics.jung.graph.Graph;
+import java.awt.Color;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+/**
+ *
+ * @author Knacky
+ */
+public class ViewHistory {
+    public Set cSetBeforeVis, cSet;
+    public Set comNodeCSetBeforeVis, comNodeCSet;
+    public GOProcessor gop;
+    public Graph storedGraph;
+    public Graph usualGraph;
+    public Map nodeToClusterMap;
+    public Map usualNodeToClusterMap;
+    public Object highlightedNode = null;
+    public BioObject searchedBioObj = null;
+    public Color highlightedNodeFormerColor = null;
+    public Layout layout = null;
+    public Map<Object,Point2D> vertexLocationMap = null;
+    public Map<Object,Point2D> usualGraphVerLocMap = null;
+    ArrayList clickedVertices = new ArrayList();
+    ArrayList concentratedVertices = new ArrayList();
+    Map colorMap = new HashMap();
+    
+    public ViewHistory(Set cSetBeforeVis, Set comNodeCSetBeforeVis,GOProcessor gop, Graph graph){
+        this.cSetBeforeVis = cSetBeforeVis;
+        this.comNodeCSetBeforeVis = comNodeCSetBeforeVis;
+        this.gop = gop;
+        this.storedGraph = graph;
+    }
+    public ViewHistory(Set cSetBeforeVis, Set comNodeCSetBeforeVis,GOProcessor gop, Layout layout){
+        this.cSetBeforeVis = cSetBeforeVis;
+        this.comNodeCSetBeforeVis = comNodeCSetBeforeVis;
+        this.gop = gop;
+        this.layout = layout;
+    }
+    public ViewHistory(){
+        
+    }
+
+    public Map<Object, Point2D> getUsualGraphVerLocMap() {
+        return usualGraphVerLocMap;
+    }
+
+    public void setUsualGraphVerLocMap(Map<Object, Point2D> usualGraphVerLocMap) {
+        this.usualGraphVerLocMap = usualGraphVerLocMap;
+    }
+
+
+    
+    public Map<Object, Point2D> getVertexLocationMap() {
+        return vertexLocationMap;
+    }
+
+    public void setVertexLocationMap(Map<Object, Point2D> vertexLocationMap) {
+        this.vertexLocationMap = vertexLocationMap;
+    }
+
+    
+    public Object getHighlightedNode() {
+        return highlightedNode;
+    }
+
+    public void setHighlightedNode(Object highlightedNode) {
+        this.highlightedNode = highlightedNode;
+    }
+
+    public Color getHighlightedNodeFormerColor() {
+        return highlightedNodeFormerColor;
+    }
+
+    public void setHighlightedNodeFormerColor(Color highlightedNodeFormerColor) {
+        this.highlightedNodeFormerColor = highlightedNodeFormerColor;
+    }
+
+    public BioObject getSearchedBioObj() {
+        return searchedBioObj;
+    }
+
+    public void setSearchedBioObj(BioObject searchedBioObj) {
+        this.searchedBioObj = searchedBioObj;
+    }
+
+    public Layout getLayout() {
+        return layout;
+    }
+
+    public void setLayout(Layout layout) {
+        this.layout = layout;
+    }
+
+    
+    public Map getNodeToClusterMap() {
+        return nodeToClusterMap;
+    }
+
+    public void setNodeToClusterMap(Map nodeToClusterMap) {
+        this.nodeToClusterMap = nodeToClusterMap;
+    }
+
+    public Map getUsualNodeToClusterMap() {
+        return usualNodeToClusterMap;
+    }
+
+    public void setUsualNodeToClusterMap(Map UsualNodeToClusterMap) {
+        this.usualNodeToClusterMap = UsualNodeToClusterMap;
+    }
+    
+    
+    public Graph getUsualGraph() {
+        return usualGraph;
+    }
+
+    public void setUsualGraph(Graph usualGraph) {
+        this.usualGraph = usualGraph;
+    }
+    
+    public Set getCSet() {
+        return cSet;
+    }
+
+    public void setCSet(Set cSet) {
+        this.cSet = cSet;
+    }
+
+    public Set getCSetBeforeVis() {
+        return cSetBeforeVis;
+    }
+
+    public void setCSetBeforeVis(Set cSetBeforeVis) {
+        this.cSetBeforeVis = cSetBeforeVis;
+    }
+
+    public ArrayList getClickedVertices() {
+        return clickedVertices;
+    }
+
+    public void setClickedVertices(ArrayList clickedVertices) {
+        this.clickedVertices = clickedVertices;
+    }
+
+    public ArrayList getConcentratedVertices() {
+        return concentratedVertices;
+    }
+
+    public void setConcentratedVertices(ArrayList concentratedVertices) {
+        this.concentratedVertices = concentratedVertices;
+    }
+
+    
+
+    public Map getColorMap() {
+        return colorMap;
+    }
+
+    public void setColorMap(Map colorMap) {
+        this.colorMap = colorMap;
+    }
+
+    public Set getComNodeCSet() {
+        return comNodeCSet;
+    }
+
+    public void setComNodeCSet(Set comNodeCSet) {
+        this.comNodeCSet = comNodeCSet;
+    }
+
+    public Set getComNodeCSetBeforeVis() {
+        return comNodeCSetBeforeVis;
+    }
+
+    public void setComNodeCSetBeforeVis(Set comNodeCSetBeforeVis) {
+        this.comNodeCSetBeforeVis = comNodeCSetBeforeVis;
+    }
+
+    public GOProcessor getGop() {
+        return gop;
+    }
+
+    public void setGop(GOProcessor gop) {
+        this.gop = gop;
+    }
+
+    public Graph getStoredGraph() {
+        return storedGraph;
+    }
+
+    public void setStoredGraph(Graph storedGraph) {
+        this.storedGraph = storedGraph;
+    }
+    
+}

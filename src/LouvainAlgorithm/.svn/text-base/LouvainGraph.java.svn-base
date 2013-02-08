@@ -1,0 +1,577 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package main;
+
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.StringTokenizer;
+
+/**
+ *
+ * @author Knacky
+ */
+public class LouvainGraph {
+    
+    public boolean isWeighted = false;
+    public int numNodes;
+    public int numLinks;
+    public double doubleSumWeight;
+    
+    public int[] degrees;
+    public int[] links;
+    public double[] weights;
+    
+    public LouvainGraph(){
+        numNodes = 0;
+        numLinks = 0;
+        doubleSumWeight = 0;
+    }
+    public LouvainGraph(File file) throws FileNotFoundException,IOException{
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+//        BufferedReader br = new BufferedReader(new InputStreamReader(fis));
+
+        int tNumLinks = 0;
+        String st;
+        StringTokenizer stn;
+        int src, dest;
+        double  weight = 1;
+//        ArrayList<Integer> tLinks = new ArrayList<Integer>();
+//        ArrayList<Double> tWeights = new ArrayList<Double>();
+        ArrayList<Integer> tDegrees = new ArrayList<Integer>();
+        //count degree
+        if ((st = br.readLine()) != null){
+//            System.out.println("");
+            stn = new StringTokenizer(st);
+
+            src = Integer.parseInt(stn.nextToken());
+            dest = Integer.parseInt(stn.nextToken());
+            if (stn.hasMoreTokens()){
+//                weight = Double.parseDouble(stn.nextToken());
+                isWeighted = true;
+            } else
+                isWeighted = false;
+
+            if (tDegrees.size() <= Math.max(src, dest)+1)
+            {
+//                tDegrees.ensureCapacity(Math.max(src, dest)+1);
+                for (int j = tDegrees.size(); j < Math.max(src, dest)+1; j ++)
+                    tDegrees.add(j,0);
+            }
+            tDegrees.set(src, tDegrees.get(src)+1);
+            if (src != dest)
+                tDegrees.set(dest, tDegrees.get(dest)+1);
+            tNumLinks++;
+
+        }
+        // count degrees
+        while ((st = br.readLine()) != null){
+            if (tNumLinks%10000==0)
+               System.out.print(".");
+            stn = new StringTokenizer(st);
+
+            src = Integer.parseInt(stn.nextToken());
+            dest = Integer.parseInt(stn.nextToken());
+
+            if (tDegrees.size() <= Math.max(src, dest)+1)
+            {
+//                tDegrees.ensureCapacity(Math.max(src, dest)+1);
+                for (int j = tDegrees.size(); j < Math.max(src, dest)+1; j ++)
+                    tDegrees.add(j,0);
+            }
+            tDegrees.set(src, tDegrees.get(src)+1);
+            if (src != dest)
+                tDegrees.set(dest, tDegrees.get(dest)+1);
+            tNumLinks++;
+        }
+        degrees = new int[tDegrees.size()];
+        numNodes = degrees.length;
+        int sum = 0;
+        for (int k = 0; k < tDegrees.size(); k++){
+            sum += tDegrees.get(k);
+            degrees[k] = sum;
+
+        }
+        // real num links according to the original one is
+        // the size of links and weight arrays
+        numLinks = degrees[degrees.length-1]/2;//tNumLinks;///2;
+//        System.out.println("real num links: "+degrees[degrees.length-1]);
+        links = new int[degrees[degrees.length-1]];
+        weights = new double[degrees[degrees.length-1]];
+        br.close();
+        br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+//        br = new BufferedReader(new InputStreamReader(fis));
+        int index = 0;
+        int renumber[] = new int[degrees.length];
+        int numSelfLoop = 0;
+        while ((st = br.readLine()) != null){
+            if (index%10000==0)
+               System.out.print(".");
+            stn = new StringTokenizer(st);
+
+            src = Integer.parseInt(stn.nextToken());
+            dest = Integer.parseInt(stn.nextToken());
+
+//            links[index] = dest;
+            //detect self-loop
+            if (src == dest){
+                numSelfLoop++;
+                if (src == 0)
+                    links[renumber[src]] = src;
+                else
+                    links[degrees[src-1]+renumber[src]] = src;
+                if (isWeighted){
+                    weight = Double.parseDouble(stn.nextToken());
+                    if (src == 0) {
+                        weights[renumber[src]] = weight;
+                    } else {
+                        weights[degrees[src - 1] + renumber[src]] = weight;
+                    }
+
+                    doubleSumWeight += weight;
+//                isWeighted = true;
+                }
+                renumber[src]++;
+            } else {
+
+                if (src == 0) {
+                    links[renumber[src]] = dest;
+                } else {
+                    links[degrees[src - 1] + renumber[src]] = dest;
+                }
+                if (dest == 0) {
+                    links[renumber[dest]] = src;
+                } else {
+                    links[degrees[dest - 1] + renumber[dest]] = src;
+                }
+                if (isWeighted){
+                    weight = Double.parseDouble(stn.nextToken());
+                    if (src == 0) {
+                        weights[renumber[src]] = weight;
+                    } else {
+                        weights[degrees[src - 1] + renumber[src]] = weight;
+                    }
+                    if (dest == 0) {
+                        weights[renumber[dest]] = weight;
+                    } else {
+                        weights[degrees[dest - 1] + renumber[dest]] = weight;
+                    }doubleSumWeight += 2*weight;
+                }
+                renumber[src]++; renumber[dest]++;
+//            renumber[dest]++;
+            }
+
+//            System.out.println(st+" "+doubleSumWeight);
+            index++;
+        }
+        if (!isWeighted){
+            weights = null;
+            doubleSumWeight += (degrees[degrees.length-1]-numSelfLoop);
+//            doubleSumWeight += (numLinks*2);
+        }
+    
+    }
+    /**
+     * Assume that all array lengths are the same.
+     * @param sArr
+     * @param dArr
+     * @param wArr
+     * @param isWeight
+     * @throws java.io.FileNotFoundException
+     * @throws java.io.IOException
+     */
+    public LouvainGraph(int[] sArr, int[] dArr, double[] wArr) throws FileNotFoundException, IOException{
+//        File f = new File(filename);
+//        System.out.println(f.getAbsolutePath());
+        
+//        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
+        isWeighted = (wArr == null)?false:true;
+//        int tNumLinks = sArr.length;
+        String st= "";
+
+        StringTokenizer stn;
+        int src, dest;
+        double  weight = 1;
+//        StringTokenizer streamReader = new StringTokenizer(stream,"\n");
+
+//        ArrayList<Integer> tLinks = new ArrayList<Integer>();
+//        ArrayList<Double> tWeights = new ArrayList<Double>();
+        ArrayList<Integer> tDegrees = new ArrayList<Integer>();
+        //count degree
+//        if ((st = br.readLine()) != null){
+        for (int i = 0; i < sArr.length; i++){
+            if (i % 10000 == 0) {
+                System.out.print(".");
+            }
+//        if (streamReader.hasMoreTokens()){
+//            st = streamReader.nextToken();
+//            System.out.println("");
+//            stn = new StringTokenizer(st);
+            src = sArr[i];
+            dest = dArr[i];
+//            src = Integer.parseInt(stn.nextToken());
+//            dest = Integer.parseInt(stn.nextToken());
+//            if (stn.hasMoreTokens()){
+////                weight = Double.parseDouble(stn.nextToken());
+//                isWeighted = true;
+//            } else
+//                isWeighted = false;
+            
+            if (tDegrees.size() <= Math.max(src, dest)+1)
+            {
+//                tDegrees.ensureCapacity(Math.max(src, dest)+1);
+                for (int j = tDegrees.size(); j < Math.max(src, dest)+1; j ++)
+                    tDegrees.add(j,0);
+            }
+            tDegrees.set(src, tDegrees.get(src)+1);
+            if (src != dest)
+                tDegrees.set(dest, tDegrees.get(dest)+1);
+//            tNumLinks++;
+            
+        }
+        // count degrees
+//        while ((st = br.readLine()) != null){
+//        while (streamReader.hasMoreTokens()) {
+//            st = streamReader.nextToken();
+//            if (tNumLinks % 10000 == 0) {
+//                System.out.print(".");
+//            }
+//            stn = new StringTokenizer(st);
+//
+//            src = Integer.parseInt(stn.nextToken());
+//            dest = Integer.parseInt(stn.nextToken());
+//
+//            if (tDegrees.size() <= Math.max(src, dest) + 1) {
+////                tDegrees.ensureCapacity(Math.max(src, dest)+1);
+//                for (int j = tDegrees.size(); j < Math.max(src, dest) + 1; j++) {
+//                    tDegrees.add(j, 0);
+//                }
+//            }
+//            tDegrees.set(src, tDegrees.get(src) + 1);
+//            if (src != dest) {
+//                tDegrees.set(dest, tDegrees.get(dest) + 1);
+//            }
+//            tNumLinks++;
+//        }
+        degrees = new int[tDegrees.size()];
+        numNodes = degrees.length;
+        int sum = 0;
+        for (int k = 0; k < tDegrees.size(); k++){
+            sum += tDegrees.get(k);
+            degrees[k] = sum;
+            
+        }
+        // real num links according to the original one is 
+        // the size of links and weight arrays
+        numLinks = degrees[degrees.length-1]/2;//tNumLinks;///2;
+//        System.out.println("real num links: "+degrees[degrees.length-1]);
+        links = new int[degrees[degrees.length-1]];
+        weights = new double[degrees[degrees.length-1]];
+//        br.close();
+//        streamReader = new StringTokenizer(stream,"\n");
+//        br = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
+//        int index = 0;
+        int renumber[] = new int[degrees.length];
+        int numSelfLoop = 0;
+//        while ((st = br.readLine()) != null){
+        for (int i = 0; i < sArr.length; i++){
+//         while (streamReader.hasMoreTokens()) {
+//            st = streamReader.nextToken();
+            if (i%10000==0)
+               System.out.print(".");
+//            stn = new StringTokenizer(st);
+            src = sArr[i];
+            dest = dArr[i];
+//            src = Integer.parseInt(stn.nextToken());
+//            dest = Integer.parseInt(stn.nextToken());
+            
+//            links[index] = dest;
+            //detect self-loop
+            if (src == dest){
+                numSelfLoop++;
+                if (src == 0)
+                    links[renumber[src]] = src;
+                else
+                    links[degrees[src-1]+renumber[src]] = src;
+                if (isWeighted){
+//                    weight = Double.parseDouble(stn.nextToken());
+                    weight = wArr[i];
+                    if (src == 0) {
+                        weights[renumber[src]] = weight;
+                    } else {
+                        weights[degrees[src - 1] + renumber[src]] = weight;
+                    }
+                    
+                    doubleSumWeight += weight;
+//                isWeighted = true;
+                } 
+                renumber[src]++; 
+            } else {
+                
+                if (src == 0) {
+                    links[renumber[src]] = dest;
+                } else {
+                    links[degrees[src - 1] + renumber[src]] = dest;
+                }
+                if (dest == 0) {
+                    links[renumber[dest]] = src;
+                } else {
+                    links[degrees[dest - 1] + renumber[dest]] = src;
+                }
+                if (isWeighted){
+//                    weight = Double.parseDouble(stn.nextToken());
+                    weight = wArr[i];
+                    if (src == 0) {
+                        weights[renumber[src]] = weight;
+                    } else {
+                        weights[degrees[src - 1] + renumber[src]] = weight;
+                    }
+                    if (dest == 0) {
+                        weights[renumber[dest]] = weight;
+                    } else {
+                        weights[degrees[dest - 1] + renumber[dest]] = weight;
+                    }doubleSumWeight += 2*weight;
+                }    
+                renumber[src]++; renumber[dest]++;
+//            renumber[dest]++;
+            }
+                
+//            System.out.println(st+" "+doubleSumWeight);
+//            index++;
+        }
+        if (!isWeighted){
+            weights = null;
+            doubleSumWeight += (degrees[degrees.length-1]-numSelfLoop);
+//            doubleSumWeight += (numLinks*2);
+        }
+    }
+    
+    public LouvainGraph(String stream) throws FileNotFoundException, IOException{
+//        File f = new File(filename);
+//        System.out.println(f.getAbsolutePath());
+        
+//        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
+
+        int tNumLinks = 0;
+        String st= "";
+
+        StringTokenizer stn;
+        int src, dest;
+        double  weight = 1;
+        StringTokenizer streamReader = new StringTokenizer(stream,"\n");
+
+//        ArrayList<Integer> tLinks = new ArrayList<Integer>();
+//        ArrayList<Double> tWeights = new ArrayList<Double>();
+        ArrayList<Integer> tDegrees = new ArrayList<Integer>();
+        //count degree
+//        if ((st = br.readLine()) != null){
+        if (streamReader.hasMoreTokens()){
+            st = streamReader.nextToken();
+//            System.out.println("");
+            stn = new StringTokenizer(st);
+            
+            src = Integer.parseInt(stn.nextToken());
+            dest = Integer.parseInt(stn.nextToken());
+            if (stn.hasMoreTokens()){
+//                weight = Double.parseDouble(stn.nextToken());
+                isWeighted = true;
+            } else
+                isWeighted = false;
+            
+            if (tDegrees.size() <= Math.max(src, dest)+1)
+            {
+//                tDegrees.ensureCapacity(Math.max(src, dest)+1);
+                for (int j = tDegrees.size(); j < Math.max(src, dest)+1; j ++)
+                    tDegrees.add(j,0);
+            }
+            tDegrees.set(src, tDegrees.get(src)+1);
+            if (src != dest)
+                tDegrees.set(dest, tDegrees.get(dest)+1);
+            tNumLinks++;
+            
+        }
+        // count degrees
+//        while ((st = br.readLine()) != null){
+        while (streamReader.hasMoreTokens()) {
+            st = streamReader.nextToken();
+            if (tNumLinks % 10000 == 0) {
+                System.out.print(".");
+            }
+            stn = new StringTokenizer(st);
+
+            src = Integer.parseInt(stn.nextToken());
+            dest = Integer.parseInt(stn.nextToken());
+
+            if (tDegrees.size() <= Math.max(src, dest) + 1) {
+//                tDegrees.ensureCapacity(Math.max(src, dest)+1);
+                for (int j = tDegrees.size(); j < Math.max(src, dest) + 1; j++) {
+                    tDegrees.add(j, 0);
+                }
+            }
+            tDegrees.set(src, tDegrees.get(src) + 1);
+            if (src != dest) {
+                tDegrees.set(dest, tDegrees.get(dest) + 1);
+            }
+            tNumLinks++;
+        }
+        degrees = new int[tDegrees.size()];
+        numNodes = degrees.length;
+        int sum = 0;
+        for (int k = 0; k < tDegrees.size(); k++){
+            sum += tDegrees.get(k);
+            degrees[k] = sum;
+            
+        }
+        // real num links according to the original one is 
+        // the size of links and weight arrays
+        numLinks = degrees[degrees.length-1]/2;//tNumLinks;///2;
+//        System.out.println("real num links: "+degrees[degrees.length-1]);
+        links = new int[degrees[degrees.length-1]];
+        weights = new double[degrees[degrees.length-1]];
+//        br.close();
+        streamReader = new StringTokenizer(stream,"\n");
+//        br = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
+        int index = 0;
+        int renumber[] = new int[degrees.length];
+        int numSelfLoop = 0;
+//        while ((st = br.readLine()) != null){
+         while (streamReader.hasMoreTokens()) {
+            st = streamReader.nextToken();
+            if (index%10000==0)
+               System.out.print(".");
+            stn = new StringTokenizer(st);
+            
+            src = Integer.parseInt(stn.nextToken());
+            dest = Integer.parseInt(stn.nextToken());
+            
+//            links[index] = dest;
+            //detect self-loop
+            if (src == dest){
+                numSelfLoop++;
+                if (src == 0)
+                    links[renumber[src]] = src;
+                else
+                    links[degrees[src-1]+renumber[src]] = src;
+                if (isWeighted){
+                    weight = Double.parseDouble(stn.nextToken());
+                    if (src == 0) {
+                        weights[renumber[src]] = weight;
+                    } else {
+                        weights[degrees[src - 1] + renumber[src]] = weight;
+                    }
+                    
+                    doubleSumWeight += weight;
+//                isWeighted = true;
+                } 
+                renumber[src]++; 
+            } else {
+                
+                if (src == 0) {
+                    links[renumber[src]] = dest;
+                } else {
+                    links[degrees[src - 1] + renumber[src]] = dest;
+                }
+                if (dest == 0) {
+                    links[renumber[dest]] = src;
+                } else {
+                    links[degrees[dest - 1] + renumber[dest]] = src;
+                }
+                if (isWeighted){
+                    weight = Double.parseDouble(stn.nextToken());
+                    if (src == 0) {
+                        weights[renumber[src]] = weight;
+                    } else {
+                        weights[degrees[src - 1] + renumber[src]] = weight;
+                    }
+                    if (dest == 0) {
+                        weights[renumber[dest]] = weight;
+                    } else {
+                        weights[degrees[dest - 1] + renumber[dest]] = weight;
+                    }doubleSumWeight += 2*weight;
+                }    
+                renumber[src]++; renumber[dest]++;
+//            renumber[dest]++;
+            }
+                
+//            System.out.println(st+" "+doubleSumWeight);
+            index++;
+        }
+        if (!isWeighted){
+            weights = null;
+            doubleSumWeight += (degrees[degrees.length-1]-numSelfLoop);
+//            doubleSumWeight += (numLinks*2);
+        }
+    }
+    
+//    public void clean(){
+//        for (int i = 0; i < links.length; i++){
+////            Map <int,double> m;
+//            
+//            for (int j = 0; j < )
+//        }
+//    }
+    
+    public int getDegree(int node){
+//        assert(node >= 0 && node < numNodes);
+        if (node == 0)
+            return degrees[0];
+        else
+            return degrees[node]-degrees[node-1];
+    }
+    
+    //ArrayList of starting index // obsolete
+    public int neighbors(int node){
+//        assert(node >= 0 && node < numNodes);
+//        ArrayList list = new ArrayList(2);
+        if (node == 0)
+        {
+            return 0;
+//            list.add(0); list.add(0);
+//            return list;
+        }
+        else
+            return degrees[node-1];
+//        else if (weights != null){
+//            list.add(degrees[node-1],degrees
+//        } else
+//        {
+//            
+//        }
+            
+    }
+    
+    public double numSelfLoops(int node){
+//        assert(node >= 0 && node < numNodes);
+        int index = neighbors(node);
+        for (int i = 0; i < getDegree(node); i++){
+            if (links[i+index] == node) {
+                if (weights != null)
+                    return weights[i+index];
+                else
+                    return 1;
+            }
+        }
+        return 0;
+    }
+    public double weightedDegree(int node){
+//        assert(node >= 0 && node < numNodes);
+        int index = neighbors(node);
+        if (weights == null)
+            return getDegree(node);
+        else {
+            double res = 0;
+            for (int i = 0;  i < getDegree(node); i++)
+                res += weights[i+index];
+            return res;
+        }
+        
+    }
+}

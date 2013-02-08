@@ -1,0 +1,414 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package util;
+
+import edu.uci.ics.jung.graph.ArchetypeVertex;
+import edu.uci.ics.jung.graph.Edge;
+import edu.uci.ics.jung.graph.Graph;
+import edu.uci.ics.jung.graph.UndirectedGraph;
+import edu.uci.ics.jung.graph.Vertex;
+import edu.uci.ics.jung.graph.decorators.EdgeWeightLabeller;
+import edu.uci.ics.jung.graph.decorators.StringLabeller;
+import edu.uci.ics.jung.graph.decorators.StringLabeller.UniqueLabelException;
+import edu.uci.ics.jung.graph.impl.UndirectedSparseEdge;
+import edu.uci.ics.jung.graph.impl.UndirectedSparseGraph;
+import edu.uci.ics.jung.graph.impl.UndirectedSparseVertex;
+import edu.uci.ics.jung.io.PajekNetWriter;
+import edu.uci.ics.jung.utils.UserData;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.StringTokenizer;
+
+/**
+ *
+ * @author Knacky
+ */
+public class TabToPajekParser {
+    static String fileToPrint = "src/temp.net";
+    public static void main(String[] args) throws FileNotFoundException, IOException, UniqueLabelException {
+//        File f = new File("src/part_yeast_intdata.tab");
+        File f = new File("src/interaction_data.tab");
+        UndirectedSparseGraph graph = new UndirectedSparseGraph();
+        StringLabeller sl = StringLabeller.getLabeller(graph, "feature name");
+        EdgeWeightLabeller ewl = EdgeWeightLabeller.getLabeller(graph, "NumEvidence");
+        
+        FileInputStream fis = new FileInputStream(f);
+        BufferedReader br = new BufferedReader(new InputStreamReader(fis));
+//        PrintWriter pw = new PrintWriter("src/part_yeast_intdata.net");
+        PajekNetWriter pw = new PajekNetWriter();
+        String st, out = "";
+        StringTokenizer stz;
+        String baitName = "", baitStName = "";
+        String hitName = "", hitStName = "";
+        String exper = "", intType = "", source = "", curation = "";
+        String note = "", phenotype = "", refer = "", citation = "";
+        int numRefWant = 0;
+        ArrayList <String> list;
+        while ((st = br.readLine()) != null) {
+            stz = new StringTokenizer(st, "\t",true);
+            assert (stz.hasMoreTokens());
+            baitName = stz.nextToken();
+            if (stz.nextToken() == "\t");
+            assert (stz.hasMoreTokens());
+            baitStName = stz.nextToken();
+            if (baitStName.equals("\t"))
+                baitStName = "";
+            else{
+                stz.nextToken();
+            }
+            
+            assert (stz.hasMoreTokens());
+            hitName = stz.nextToken();
+            if (stz.nextToken() == "\t");
+            
+            //self loop
+            if (hitName.equals(baitName)){
+                continue;//System.out.println("Self Loop "+hitName);
+            }
+            
+            assert (stz.hasMoreTokens());
+            hitStName = stz.nextToken();
+            if (hitStName.equals("\t"))
+                hitStName = "";
+            else{
+                stz.nextToken();
+            }
+//            System.out.println(hitStName);
+            Vertex bait;
+            if (sl.getVertex(baitName)==null) {
+                bait = new UndirectedSparseVertex();
+                graph.addVertex(bait);
+                sl.setLabel(bait, baitName);
+                bait.addUserDatum("feature name", baitName, UserData.SHARED);
+                bait.addUserDatum("standard name", baitStName, UserData.SHARED);
+//                System.out.println(sl.getLabel(bait));
+            } else
+            {
+                bait = sl.getVertex(baitName);
+            }
+//            System.out.println(sl.hasStringLabeller(graph, "feature name"));
+           
+            Vertex hit;
+            if (sl.getVertex(hitName)==null) {
+                hit = new UndirectedSparseVertex();
+                graph.addVertex(hit);
+                sl.setLabel(hit, hitName);
+                hit.addUserDatum("feature name", hitName, UserData.SHARED);
+                hit.addUserDatum("standard name", hitStName, UserData.SHARED);
+//                System.out.println(sl.getLabel(hit));
+            } else {
+                hit = sl.getVertex(hitName);
+            }
+            
+                
+//            System.out.println(sl.getLabel(bait)+" "+sl.getLabel(hit));
+            Edge edge;
+            
+            assert (stz.hasMoreTokens());
+            exper = stz.nextToken();
+            if (stz.nextToken() == "\t");
+            assert (stz.hasMoreTokens());
+            intType = stz.nextToken();
+            if (stz.nextToken() == "\t");
+            assert (stz.hasMoreTokens());
+            source = stz.nextToken();
+            if (stz.nextToken() == "\t");
+            assert (stz.hasMoreTokens());
+            curation = stz.nextToken();
+            if (stz.nextToken() == "\t");
+            
+            note = stz.nextToken();
+            if (note.equals("\t"))
+                note = "";
+            else{
+                stz.nextToken();
+            }
+            
+            assert (stz.hasMoreTokens());
+            phenotype = stz.nextToken();
+            if (phenotype.equals("\t"))
+                phenotype = "";
+            else{
+                stz.nextToken();
+            }
+            
+            assert (stz.hasMoreTokens());
+            refer = stz.nextToken();
+            if (refer.contains("11283351"))
+                numRefWant++;
+            if (stz.nextToken() == "\t");
+            assert (stz.hasMoreTokens());
+            citation = stz.nextToken();
+//            System.gc();
+            list = new ArrayList<String>();
+            
+            if (!bait.isNeighborOf(hit)){
+                edge = graph.addEdge(new UndirectedSparseEdge(bait, hit));
+                edge.setUserDatum("NumEvidence", (int)1, UserData.SHARED);
+                ewl.setWeight(edge, 1);
+                list.add(exper);
+                edge.setUserDatum("Experiment",list, UserData.SHARED);
+                list = new ArrayList<String>();
+                list.add(curation);
+                edge.setUserDatum("Curation",list, UserData.SHARED);
+                list = new ArrayList<String>();
+                list.add(citation);
+                edge.setUserDatum("Citation",list, UserData.SHARED);
+                list = new ArrayList<String>();
+                list.add(intType);
+                edge.setUserDatum("Interaction",list, UserData.SHARED);
+                list = new ArrayList<String>();
+                list.add(refer);
+                edge.setUserDatum("Reference",list, UserData.SHARED);
+                list = new ArrayList<String>();
+                list.add(phenotype);
+                edge.setUserDatum("Phenotype",list, UserData.SHARED);
+//
+                list = new ArrayList<String>();
+                list.add(note);
+                edge.setUserDatum("Note",list, UserData.SHARED);
+            } else {
+                edge = bait.findEdge(hit); 
+                
+                int oldnum = (Integer)edge.getUserDatum("NumEvidence");
+                edge.setUserDatum("NumEvidence", 1+oldnum , UserData.SHARED);
+                ewl.setWeight(edge,1+oldnum);
+                
+                ((ArrayList)edge.getUserDatum("Experiment")).add(exper);
+                ((ArrayList)edge.getUserDatum("Curation")).add(curation);
+                ((ArrayList)edge.getUserDatum("Citation")).add(citation);
+                ((ArrayList)edge.getUserDatum("Interaction")).add(intType);
+                ((ArrayList)edge.getUserDatum("Reference")).add(refer);
+                ((ArrayList)edge.getUserDatum("Phenotype")).add(phenotype);
+                ((ArrayList)edge.getUserDatum("Note")).add(note);
+//                System.out.println(baitName+" "+hitName+" "+((ArrayList)edge.getUserDatum("Phenotype")));
+            }
+//            break;
+        }
+
+        System.out.println(graph.numEdges()+" "+graph.numVertices());
+        System.out.println("Num ref want: "+numRefWant);
+//        pw.println("*Vertices\t"+graph.numVertices());
+        
+        // print all edges
+        
+//        pw.save(graph, "src/all_yeast_intdata_noself.net",sl,ewl);
+//        System.out.println(graph.getEdges());
+//        System.out.println(graph.getVertices());
+
+//        findItoSet(pw,graph,sl,ewl);
+//        find2IntUp(pw,graph,sl,ewl);
+        findCuration(pw,graph,sl,ewl);
+//        find3RefUp(pw, graph, sl, ewl);
+//        find2ExpUp(pw,graph,sl,ewl);
+//      
+    }
+    static void findCuration(PajekNetWriter pw, Graph graph,StringLabeller sl, EdgeWeightLabeller ewl) throws IOException {
+        UndirectedSparseGraph g2 = new UndirectedSparseGraph();
+        g2 = (UndirectedSparseGraph) graph.copy();
+        ArrayList<String> list = new ArrayList();
+        for (Object e : graph.getEdges()) {
+            Edge edge = (Edge) e;
+
+            list = ((ArrayList) edge.getUserDatum("Curation"));
+            
+            Set<String> s = new HashSet<String>();
+            s.addAll(list);
+            boolean ok = false;
+            for (String st : s){
+//                if (st.contains("manually") || st.contains("Manually"))
+                 if (st.contains("high") || st.contains("high"))
+                    ok = true;
+            }
+            if (!ok){
+//            if (s.size() < 2){
+                Edge edgeToDel = (Edge) edge.getEqualEdge(g2);
+                g2.removeEdge(edgeToDel);
+            }
+//            if (s.size() != list.size()){
+//                System.out.println(s);
+//                System.out.println(list);
+//            }
+                
+        }
+        //delete node degree 0
+        int numVerDel = 0;
+        graph = (UndirectedSparseGraph) g2.copy();
+        for (Object v : graph.getVertices()){
+            Vertex vertex = (Vertex)v;
+            if (vertex.degree() < 1){
+                g2.removeVertex((Vertex) vertex.getEqualVertex(g2));
+                numVerDel ++;
+            }
+        }
+
+//        pw.save(g2, "src/CurMore1intdata.net",sl,ewl);
+//        pw.save(g2, "src/CurManintdata.net",sl,ewl);
+        pw.save(g2, "src/CurHighintdata.net",sl,ewl);
+        System.out.println("Num edges: "+g2.numEdges()+" Num nodes: "+g2.numVertices());
+        System.out.println("Num Ver Del: "+numVerDel);
+    }
+    static void find2IntUp(PajekNetWriter pw, Graph graph,StringLabeller sl, EdgeWeightLabeller ewl) throws IOException {
+        UndirectedSparseGraph g2 = new UndirectedSparseGraph();
+        g2 = (UndirectedSparseGraph) graph.copy();
+        ArrayList<String> list = new ArrayList();
+        for (Object e : graph.getEdges()) {
+            Edge edge = (Edge) e;
+
+            list = ((ArrayList) edge.getUserDatum("Interaction"));
+            Set s = new HashSet<String>();
+            s.addAll(list);
+            if (s.size() < 2){
+//            if (s.size() < 2){
+                Edge edgeToDel = (Edge) edge.getEqualEdge(g2);
+                g2.removeEdge(edgeToDel);
+            }
+//            if (s.size() != list.size()){
+//                System.out.println(s);
+//                System.out.println(list);
+//            }
+                
+        }
+        //delete node degree 0
+        int numVerDel = 0;
+        graph = (UndirectedSparseGraph) g2.copy();
+        for (Object v : graph.getVertices()){
+            Vertex vertex = (Vertex)v;
+            if (vertex.degree() < 1){
+                g2.removeVertex((Vertex) vertex.getEqualVertex(g2));
+                numVerDel ++;
+            }
+        }
+
+        pw.save(g2, "src/IntMore1intdata.net",sl,ewl);
+        System.out.println("Num edges: "+g2.numEdges()+" Num nodes: "+g2.numVertices());
+        System.out.println("Num Ver Del: "+numVerDel);
+    }
+    static void find2ExpUp(PajekNetWriter pw, Graph graph,StringLabeller sl, EdgeWeightLabeller ewl) throws IOException {
+        
+        UndirectedSparseGraph g2 = new UndirectedSparseGraph();
+        g2 = (UndirectedSparseGraph) graph.copy();
+        ArrayList<String> list = new ArrayList();
+        for (Object e : graph.getEdges()) {
+            Edge edge = (Edge) e;
+//            list = ((ArrayList)edge.getUserDatum("Citation"));
+            list = ((ArrayList) edge.getUserDatum("Experiment"));
+            Set s = new HashSet<String>();
+            s.addAll(list);
+            if (s.size() < 3){
+//            if (s.size() < 2){
+                Edge edgeToDel = (Edge) edge.getEqualEdge(g2);
+                g2.removeEdge(edgeToDel);
+            }
+//            if (s.size() != list.size()){
+//                System.out.println(s);
+//                System.out.println(list);
+//            }
+                
+        }
+        //delete node degree 0
+        int numVerDel = 0;
+        graph = (UndirectedSparseGraph) g2.copy();
+        for (Object v : graph.getVertices()){
+            Vertex vertex = (Vertex)v;
+            if (vertex.degree() < 1){
+                g2.removeVertex((Vertex) vertex.getEqualVertex(g2));
+                numVerDel ++;
+            }
+        }
+//        pw.save(g2, "src/ExpMore2intdata.net",sl,ewl);
+        pw.save(g2, "src/ExpMore3intdata.net",sl,ewl);
+        System.out.println("Num edges: "+g2.numEdges()+" Num nodes: "+g2.numVertices());
+        System.out.println("Num Ver Del: "+numVerDel);
+    }
+    static void find3RefUp(PajekNetWriter pw, Graph graph,StringLabeller sl, EdgeWeightLabeller ewl) throws IOException {
+
+        UndirectedSparseGraph g2 = new UndirectedSparseGraph();
+        g2 = (UndirectedSparseGraph) graph.copy();
+        ArrayList<String> list = new ArrayList();
+        for (Object e : graph.getEdges()) {
+            Edge edge = (Edge) e;
+//            list = ((ArrayList)edge.getUserDatum("Citation"));
+            list = ((ArrayList) edge.getUserDatum("Reference"));
+            Set s = new HashSet<String>();
+            s.addAll(list);
+            if (s.size() < 3){
+                Edge edgeToDel = (Edge) edge.getEqualEdge(g2);
+                g2.removeEdge(edgeToDel);
+            }
+//            if (s.size() != list.size()){
+//                System.out.println(s);
+//                System.out.println(list);
+//            }
+                
+        }
+        //delete node degree 0
+        int numVerDel = 0;
+        graph = (UndirectedSparseGraph) g2.copy();
+        for (Object v : graph.getVertices()){
+            Vertex vertex = (Vertex)v;
+            if (vertex.degree() < 1){
+                g2.removeVertex((Vertex) vertex.getEqualVertex(g2));
+                numVerDel ++;
+            }
+        }
+        pw.save(g2, "src/RefMore3intdata.net",sl,ewl);
+        System.out.println("Num edges: "+g2.numEdges()+" Num nodes: "+g2.numVertices());
+        System.out.println("Num Ver Del: "+numVerDel);
+    }
+    static void findItoSet(PajekNetWriter pw, Graph graph,StringLabeller sl, EdgeWeightLabeller ewl) throws IOException{
+        UndirectedSparseGraph g2 = new UndirectedSparseGraph();
+        g2 = (UndirectedSparseGraph) graph.copy();
+        ArrayList<String> list = new ArrayList();
+        for (Object e : graph.getEdges()){
+            Edge edge = (Edge) e;
+//            list = ((ArrayList)edge.getUserDatum("Citation"));
+            list = ((ArrayList)edge.getUserDatum("Reference"));
+            boolean wantedFound = false;
+            for (String s : list) {
+//                if (s.contains("Ito T")) {
+                if (s.contains("11283351")) {
+                    wantedFound = true;
+//                System.out.println(sl.getLabel((ArchetypeVertex) edge.getEndpoints().getFirst())+" "+sl.getLabel((ArchetypeVertex) edge.getEndpoints().getSecond())+" "+edge.getUserDatum("NumEvidence"));
+//                System.out.println(edge.getUserDatum("Reference"));
+//                 System.out.println(edge.getUserDatum("Interaction"));
+//                 System.out.println(edge.getUserDatum("Experiment"));
+//                 System.out.println();
+                }
+
+            }
+            if (!wantedFound){
+                Edge edgeToDel = (Edge) edge.getEqualEdge(g2);
+//                Vertex v1 = (Vertex) edgeToDel.getEndpoints().getFirst();
+////                v1 = (Vertex) v1.getEqualVertex(g2);
+//                Vertex v2 = (Vertex) edgeToDel.getEndpoints().getSecond();
+//                v2 = (Vertex) v2.getEqualVertex(g2);
+                g2.removeEdge(edgeToDel);
+//                if (v1.degree() < 1)
+//                    g2.removeVertex(v1);
+//                if (v2.degree() < 1)
+//                    g2.removeVertex(v2);
+
+            }
+        }
+        graph = (UndirectedSparseGraph) g2.copy();
+        for (Object v : graph.getVertices()){
+            Vertex vertex = (Vertex)v;
+            if (vertex.degree() < 1)
+                g2.removeVertex((Vertex) vertex.getEqualVertex(g2));
+        }
+        pw.save(g2, "src/ItoT_intdata.net",sl,ewl);
+        System.out.println(g2.numEdges()+" "+g2.numVertices());
+        
+    }
+}

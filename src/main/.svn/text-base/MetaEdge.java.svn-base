@@ -1,0 +1,65 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package main;
+
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+ *
+ * @author Knacky
+ */
+
+public class MetaEdge<E> extends Object {
+    String name = "";
+    Set<E> edgeSetBundled = new HashSet<E>();
+    int numEdgeSetBundled = 0;
+
+    //Intentionally not clone or copy. Just refer to the edgeSet
+    public MetaEdge(String s, Set<E> edgeSet) {
+        name = s;
+        edgeSetBundled = edgeSet;
+        numEdgeSetBundled = edgeSetBundled.size();
+    }
+    public MetaEdge(String s, E edge) {
+        name = s;
+        this.addEdge(edge);
+    }
+    public MetaEdge(String s) {
+        name = s;
+
+    }
+
+    public void setName(String s) {
+        name = s;
+    }
+
+    public void setEdgeSetBundled(Set<E> edgeSet) {
+        edgeSetBundled = edgeSet;
+        numEdgeSetBundled = edgeSetBundled.size();
+    }
+
+    public void addEdge(E edge){
+        edgeSetBundled.add(edge);
+        numEdgeSetBundled += 1;
+    }
+    public String getName() {
+        return name;
+    }
+
+    public Set<E> getEdgeSetBundled() {
+        return edgeSetBundled;
+    }
+
+    public int getNumEdgeSetBundled() {
+        return numEdgeSetBundled;
+    }
+
+    @Override
+    public String toString() {
+        return "Num edge: " + numEdgeSetBundled + " " + edgeSetBundled;
+    }
+}

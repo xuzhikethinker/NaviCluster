@@ -1,0 +1,192 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package main;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import util.StopWatch;
+
+/**
+ *
+ * @author Knacky
+ */
+public class MainLouvain {
+//    static  String filename = "src/input.txt";
+//    static boolean isWeighted = false;
+    static int numPass = 0;
+    static double precision = 0.000001;
+//    static double precision = 0.001;
+    
+    public int[][] louvainClusterer(int[] sArr,int[] dArr,double[] wArr) throws FileNotFoundException, IOException{
+        LouvainClusterer c = new LouvainClusterer(sArr, dArr, wArr,  -1, precision);
+        
+        ArrayList <int []> comNodeHieararchy = new ArrayList();
+        //file read
+        StopWatch overallTime = new StopWatch();
+        overallTime.start();
+        double mod = c.modularity();
+        
+        // networks , nodes, links ,weight
+        System.out.println("\nEpoch 0");
+        System.out.println("Modularity: "+mod);
+        System.out.println("num node: "+c.g.numNodes+" num edge: "+c.g.numLinks+" total weight: "+c.g.doubleSumWeight);
+        StopWatch sw = new StopWatch();
+        sw.start();
+        double newMod = c.phase1();
+        sw.stop();
+        System.out.println("Phase 1 Time Used: "+sw);
+        //communities computed
+        // improve from mod to newmod
+        
+        comNodeHieararchy.add(c.nodeToCom);
+        sw.start();
+        LouvainGraph g = c.phase2();
+        
+        sw.stop();
+        System.out.println("Phase 2 Time Used: "+sw);
+        System.out.println("Modularity increased from "+mod+" to "+newMod);
+        
+        //network of communities computed
+        
+        int level = 0;
+        while (newMod - mod > precision) {
+            mod = newMod;
+            System.out.println("\nEpoch "+(level+1));
+            System.out.println("num node: "+g.numNodes+" num edge: "+g.numLinks+" total weight: "+g.doubleSumWeight);
+            System.out.println("Modularity: "+mod);
+            c = new LouvainClusterer(g, -1, precision);
+            // shows network: nodes, links, weight
+            
+            sw.start();
+            newMod = c.phase1();
+            sw.stop();
+            System.out.println("Phase 1 Time Used: "+sw);
+            //communities computed
+            // improve from mod to newmod
+            comNodeHieararchy.add(c.nodeToCom);
+            sw.start();
+            g = c.phase2();
+            sw.stop();
+            System.out.println("Phase 2 Time Used: "+sw);
+            System.out.println("Modularity increased from "+mod+" to "+newMod);
+//            System.out.println("num node: "+g.numNodes+" num edge: "+g.numLinks+" total weight: "+g.doubleSumWeight);
+            level++;
+
+        //network of communities computed
+        }
+        System.out.println(newMod);
+        overallTime.stop();
+        System.out.println("Overall Time Used: "+overallTime);
+        //display time
+        int toReturn[][] = (int [][])comNodeHieararchy.toArray(new int[comNodeHieararchy.size()][]);
+        return toReturn;
+    }
+    public int[][] louvainClusterer(String st, boolean isFileName) throws FileNotFoundException, IOException{
+        //start
+        
+        //        boolean weighted = false;
+//        boolean weighted = true;
+        LouvainClusterer c = new LouvainClusterer(st, -1, precision,isFileName);
+        ArrayList <int []> comNodeHieararchy = new ArrayList();
+        //file read
+        StopWatch overallTime = new StopWatch();
+        overallTime.start();
+        double mod = c.modularity();
+        
+        // networks , nodes, links ,weight
+        System.out.println("\nEpoch 0");
+        System.out.println("Modularity: "+mod);
+        System.out.println("num node: "+c.g.numNodes+" num edge: "+c.g.numLinks+" total weight: "+c.g.doubleSumWeight);
+        StopWatch sw = new StopWatch();
+        sw.start();
+        double newMod = c.phase1();
+        sw.stop();
+        System.out.println("Phase 1 Time Used: "+sw);
+        //communities computed
+        // improve from mod to newmod
+        
+        comNodeHieararchy.add(c.nodeToCom);
+        sw.start();
+        LouvainGraph g = c.phase2();
+        
+        sw.stop();
+        System.out.println("Phase 2 Time Used: "+sw);
+        System.out.println("Modularity increased from "+mod+" to "+newMod);
+        
+        //network of communities computed
+        
+        int level = 0;
+        while (newMod - mod > precision) {
+            mod = newMod;
+            System.out.println("\nEpoch "+(level+1));
+            System.out.println("num node: "+g.numNodes+" num edge: "+g.numLinks+" total weight: "+g.doubleSumWeight);
+            System.out.println("Modularity: "+mod);
+            c = new LouvainClusterer(g, -1, precision);
+            // shows network: nodes, links, weight
+            
+            sw.start();
+            newMod = c.phase1();
+            sw.stop();
+            System.out.println("Phase 1 Time Used: "+sw);
+            //communities computed
+            // improve from mod to newmod
+            comNodeHieararchy.add(c.nodeToCom);
+            sw.start();
+            g = c.phase2();
+            sw.stop();
+            System.out.println("Phase 2 Time Used: "+sw);
+            System.out.println("Modularity increased from "+mod+" to "+newMod);
+//            System.out.println("num node: "+g.numNodes+" num edge: "+g.numLinks+" total weight: "+g.doubleSumWeight);
+            level++;
+
+        //network of communities computed
+        }
+        System.out.println(newMod);
+        overallTime.stop();
+        System.out.println("Overall Time Used: "+overallTime);
+        //display time
+        int toReturn[][] = (int [][])comNodeHieararchy.toArray(new int[comNodeHieararchy.size()][]);
+        return toReturn;
+//        return comNodeHieararchy.toArray(new Integer[comNodeHieararchy.size()][]);
+//        return null;
+    }
+    
+    public static void main(String[] args) throws FileNotFoundException, IOException {
+          String filename = "src/karate.txt";
+//        String filename = "src/arxiv.txt";
+//        String filename = "src/kl265.txt";
+        
+        
+//        String filename = "src/example.txt";        
+//        String filename = "src/input.txt";
+//        String filename = "src/temp2.txt";
+        
+        /*Yeast SGD Data Set*/
+//        String filename = "src/all_yeast_intdata.txt";
+//          String filename = "src/all_yeast_intdata_noself.txt";
+//        String filename = "src/RefMore3intdata.txt";
+//        String filename = "src/ExpMore3intdata.txt";
+//          String filename = "src/IntMore1intdata.txt";
+//          String filename = "src/CurMore1intdata.txt";
+//          String filename = "src/CurHighintdata.txt";
+//          String filename = "src/CurManintdata.txt";
+//        String filename = "src/ItoT_intdata.txt";
+        if (args.length > 0)
+        {
+            filename = args[0];
+        }
+        MainLouvain ml = new MainLouvain();
+        int[][] comNodeHierarchy = ml.louvainClusterer(filename,true);
+//        for (int i = 0; i < comNodeHierarchy.length; i++)
+//        {
+//            for (int j = 0; j < comNodeHierarchy[i].length; j++){
+//                System.out.print(comNodeHierarchy[i][j]+" ");
+//            }
+//            System.out.println("");
+//        }
+    }
+}

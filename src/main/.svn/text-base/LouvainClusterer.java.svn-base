@@ -1,0 +1,345 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package main;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Random;
+
+/**
+ *
+ * @author Knacky
+ * Using primitve data structures in hope that it will improve the overall speed 
+ * of clustering
+ */
+public class LouvainClusterer {
+    LouvainGraph g;
+    int size;
+    public int[] nodeToCom;
+    double[] in, tot;
+    int numPass;
+    double minMod;
+    
+    public LouvainClusterer(String st,  int numPass, double minm,boolean isFileName) throws FileNotFoundException, IOException{
+        if (isFileName){
+//            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(new File(filename))));
+//            InputStreamReader isr = new InputStreamReader(new FileInputStream(new File(st)));
+//            FileInputStream fis = new FileInputStream(new File(st));
+//        g = new LouvainGraph(filename);//, isWeighted);
+            g = new LouvainGraph(new File(st));//, isWeighted);
+        }
+        else
+            g = new LouvainGraph(st);
+        init(numPass, minm);
+
+//        size = g.numNodes;
+//        
+//        nodeToCom = new int[size];
+//        in = new double[size];
+//        tot = new double[size];
+//        
+////        int tmpSelf = 0;
+//        for (int i = 0; i < size; i++){
+//            nodeToCom[i] = i;
+//            in[i] = g.numSelfLoops(i);
+////            if (in[i] != 0)
+////                tmpSelf++;
+////                System.out.print(i+"\t");
+//            tot[i] = g.weightedDegree(i);
+//        }
+////        System.out.println(tmpSelf);
+//        System.out.println("\nGraph weighted? "+g.isWeighted);
+//        this.numPass = numPass;
+//        minMod = minm;
+        
+    }
+    
+    public LouvainClusterer(int[] sArr,int[] dArr, double[] wArr,  int numPass, double minm) throws FileNotFoundException, IOException{
+        g = new LouvainGraph(sArr, dArr, wArr);
+        init(numPass, minm);
+//
+//        size = g.numNodes;
+//        
+//        nodeToCom = new int[size];
+//        in = new double[size];
+//        tot = new double[size];
+//        
+////        int tmpSelf = 0;
+//        for (int i = 0; i < size; i++){
+//            nodeToCom[i] = i;
+//            in[i] = g.numSelfLoops(i);
+////            if (in[i] != 0)
+////                tmpSelf++;
+////                System.out.print(i+"\t");
+//            tot[i] = g.weightedDegree(i);
+//        }
+////        System.out.println(tmpSelf);
+//        System.out.println("\nGraph weighted? "+g.isWeighted);
+//        this.numPass = numPass;
+//        minMod = minm;
+        
+    }
+    
+    public LouvainClusterer(LouvainGraph gc, int numPass, double minm){
+        g = gc;
+        init(numPass, minm);
+//        size = g.numNodes;
+//        
+//        nodeToCom = new int[size];
+//        in = new double[size];
+//        tot = new double[size];
+//        
+//        for (int i = 0; i < size; i++){
+//            nodeToCom[i] = i;
+//            in[i] = g.numSelfLoops(i);
+//            tot[i] = g.weightedDegree(i);
+//        }
+//        this.numPass = numPass;
+//        minMod = minm;
+        
+    }
+    
+    public void init(int numPass, double minm){
+        size = g.numNodes;
+        nodeToCom = new int[size];
+        in = new double[size];
+        tot = new double[size];
+        
+//        int tmpSelf = 0;
+        for (int i = 0; i < size; i++){
+            nodeToCom[i] = i;
+            in[i] = g.numSelfLoops(i);
+//            if (in[i] != 0)
+//                tmpSelf++;
+//                System.out.print(i+"\t");
+            tot[i] = g.weightedDegree(i);
+        }
+//        System.out.println(tmpSelf);
+        System.out.println("\nGraph weighted? "+g.isWeighted);
+        this.numPass = numPass;
+        minMod = minm;
+    }
+    public void remove(int node, int comm, double dnodecomm){
+        tot[comm] -= g.weightedDegree(node);
+        in[comm] -= 2*dnodecomm + g.numSelfLoops(node);
+        nodeToCom[node] = -1;
+    }
+    public void insert(int node, int comm, double dnodecomm){
+        tot[comm] += g.weightedDegree(node);
+        in[comm] += 2*dnodecomm + g.numSelfLoops(node);
+        nodeToCom[node] = comm;
+    }
+    public double modGain(int node, int comm,double dnodecomm){
+        double totc = tot[comm];
+        double degc = g.weightedDegree(node);
+        double m2 = g.doubleSumWeight;
+        double dnc = dnodecomm;
+        
+        return (dnc - totc*degc/m2);
+    }
+    public double modularity(){
+        double q = 0.0;
+        double m2 = g.doubleSumWeight;
+        
+        for (int i = 0; i <size; i++){
+            if (tot[i] > 0){
+                q += (in[i]/m2)-(tot[i]/m2)*(tot[i]/m2);
+            }
+        }
+        
+        return q;
+        
+    }
+    
+    public Map <Integer, Double> neighComm(int node) {
+        Map <Integer, Double> res = new HashMap();
+        int index = g.neighbors(node);
+        
+        int deg = g.getDegree(node);
+        
+        res.put(nodeToCom[node], 0.0);
+        
+        for (int i = 0; i < deg; i++) {
+            int neigh = g.links[index+i];
+            int neighComm = nodeToCom[neigh];
+            double neighWeight = (g.weights != null)? g.weights[index+i] : 1;
+            
+            if (neigh != node) {
+                if (res.containsKey(neighComm)){
+                    res.put(neighComm, res.get(neighComm)+neighWeight);
+                    
+                } else {
+                    res.put(neighComm, neighWeight);
+                }
+            }
+        }
+        return res;
+    }
+    
+    public double phase1(){
+        boolean improvement = false;
+        int numPassDone = 0;
+        double newMod = modularity();
+        double curMod = newMod;
+        
+        Random r = new Random(System.currentTimeMillis());
+        
+//        Vertex[] verList = (Vertex[])graph.getVertices().toArray();
+//        Vertex[] verList = (Vertex[])graph.getVertices().toArray(new Vertex[graph.getVertices().size()]);
+//        Integer []randomOrder = (Integer [])graph.getVertices().toArray(new Integer[graph.getVertices().size()]);
+        int randomOrder[] = new int [size];
+        for (int i = 0; i < randomOrder.length; i++)
+            randomOrder[i] = i;
+        for (int i = 0; i < size-1; i++){
+            int rand_pos = r.nextInt(size-i)+i;
+//            System.out.println(rand_pos);
+            int tmp = randomOrder[i];
+            randomOrder[i] = randomOrder[rand_pos];
+            randomOrder[rand_pos] = tmp;
+        }
+        
+        do {
+            curMod = newMod;
+            improvement = false;
+            numPassDone++;
+            
+            for (int nodeTemp = 0; nodeTemp < size; nodeTemp++){
+//                int node = nodeTemp;
+                
+                int node = randomOrder[nodeTemp];
+                int nodeComm = nodeToCom[node];
+                
+                Map <Integer, Double> ncomm = neighComm(node);
+                
+                remove(node,nodeComm,ncomm.get(nodeComm));
+                
+                int bestComm = nodeComm;
+                double bestNumLinks = 0;
+                double bestIncrease = 0;
+                for (Entry it : ncomm.entrySet() ){
+                    double increase = modGain(node,(Integer) it.getKey(),(Double) it.getValue());
+                    if (increase > bestIncrease) {
+                        bestComm = (Integer)it.getKey();
+                        bestNumLinks = (Double)it.getValue();
+                        bestIncrease = increase;
+                    }
+                }
+                
+                insert(node,bestComm,bestNumLinks);
+                
+                if (bestComm != nodeComm)
+                    improvement = true;
+                
+            }
+            
+            newMod = modularity();
+
+            System.out.println("Pass "+(numPassDone)+" modularity: "+newMod);
+        } while (improvement && newMod-curMod > minMod && numPassDone != numPass);
+        
+        return newMod;
+    }
+    
+    public LouvainGraph phase2(){
+        int[] renumber = new int[size];
+        Arrays.fill(renumber, -1);
+        for (int node = 0; node < size; node++){
+            renumber[nodeToCom[node]]++;
+        }
+        
+        int newSize = 0;
+        for (int i = 0; i < size; i ++)
+        {
+            if (renumber[i] != -1)
+                renumber[i] = newSize++;
+        }
+        
+//        //debug
+//        for (int node = 0; node < size; node++){
+//            System.out.print(nodeToCom[node]+" ");
+//        }
+//        System.out.println("");
+//        //debug
+        
+        ArrayList<Integer> [] commNodes = new ArrayList[newSize];
+        for (int node = 0; node < size; node++){
+            if (commNodes[renumber[nodeToCom[node]]] == null)
+                commNodes[renumber[nodeToCom[node]]] = new ArrayList<Integer>();
+            commNodes[renumber[nodeToCom[node]]].add(node);
+        }
+        
+        LouvainGraph g2 = new LouvainGraph();
+        g2.numNodes = commNodes.length;
+        g2.degrees = new int [commNodes.length];
+        g2.links = new int[g.links.length];
+        g2.weights = new double[g.links.length];
+        g2.isWeighted = true;
+        
+        int where = 0;
+        int commDeg = commNodes.length;
+        for (int comm = 0; comm < commDeg; comm++){
+            Map <Integer, Double> m = new HashMap();
+            
+            int commSize = commNodes[comm].size();
+            for (int node = 0; node < commSize; node++) {
+                int index = g.neighbors(commNodes[comm].get(node));
+                int deg = g.getDegree(commNodes[comm].get(node));
+                for (int i = 0; i < deg; i++){
+                    int neigh = g.links[index+i];
+                    int neighComm = renumber[nodeToCom[neigh]];
+                    double neighWeight = (g.weights != null)? g.weights[index+i] : 1;
+                    
+                    if (m.containsKey(neighComm)){
+                        m.put(neighComm, m.get(neighComm)+neighWeight);    
+                    } else {
+                        m.put(neighComm, neighWeight);
+                    }
+                }
+            }
+            
+            g2.degrees[comm] = (comm == 0)?m.size():g2.degrees[comm-1]+m.size();
+            g2.numLinks += m.size();
+            // After pass 1, numLink is equal to 2*numEdges
+            for (Entry it : m.entrySet()){
+                g2.doubleSumWeight += (Double)it.getValue();
+                g2.links[where] = (Integer)it.getKey();
+                g2.weights[where] = (Double)it.getValue();
+                where++;
+            }
+//            System.out.println(g2.doubleSumWeight);
+            
+        }
+        
+        int[] tempLinks = new int[where];
+        for (int i = 0; i < tempLinks.length; i++){
+            tempLinks[i] = g2.links[i];
+        }
+        g2.links = tempLinks;
+        
+        double[] tempWeights = new double[where];
+        for (int i = 0; i < tempWeights.length; i++){
+            tempWeights[i] = g2.weights[i];
+        }
+        g2.weights = tempWeights;
+//        for (int i = 0; i < g2.degrees.length; i++)
+//            System.out.print(g2.degrees[i]+" ");
+//        System.out.println("");
+//        for (int i = 0; i < g2.links.length; i++){
+//            System.out.println(g2.links[i]+" "+g2.weights[i]);
+//        }
+//        System.out.println(g2.weights.length);
+        return g2;
+    }
+}

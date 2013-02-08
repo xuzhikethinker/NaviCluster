@@ -1,0 +1,200 @@
+activity (7529) --> act.
+of (7470) --> [Delete]
+regulation (5259) --> reg.
+process (3834) --> proc.
+cell (2433) -->
+positive (1657) --> pos.
+negative (1638) --> neg.
+biosynthetic (1447) --> biosyn.
+complex (1429) --> clx.
+in (1377) --> (Delete)
+to (1360) --> (Delete)
+binding (1332) --> bind.
+metabolic (1299) --> metab.
+receptor (1234) --> r.
+response (1189) --> resp.
+development (1054) --> dev.
+protein (1036) --> prot.
+catabolic (1035) --> catab.
+by (1007) --> (Delete)
+acid (843) --> ac.
+host (796) -->
+transport (789) --> transp.
+involved (773) --> (Delete)
+signaling (687) --> signal.
+differentiation (646) --> diff.
+pathway (639) --> path.
+formation (554) --> form.
+morphogenesis (538) --> morphogen.
+cellular (536) --> cell.
+during (527) --> (Delete)
+membrane (524) --> memb.
+transporter (524) --> transp.
+dehydrogenase (519) -->
+transmembrane (501) --> transmemb.
+symbiont (475) --> symbio.
+via (475) --> (Delete)
+growth (409) -->
+organism (407) --> org.
+kinase (392) -->
+synthase (392) -->
+from (372) --> (Delete)
+factor (368) --> fac.
+production (358) --> prod.
+muscle (343) -->
+DNA (335) -->
+RNA (327) -->
+assembly (326) -->
+ion (326) -->
+or (306) --> (Delete)
+reductase (301) -->
+interaction (295) --> int.
+signal (279) --> sig.
+transcription (279) --> transcript.
+and (277) --> (Delete)
+fate (275) -->
+stimulus (270) --> stim.
+secretion (269) --> secr.
+proliferation (261) --> prolifer.
+on (261) --> (Delete)
+other (254) -->
+organization (246) --> organiz.
+T (244) -->
+symbiotic (238) --> symbio.
+amino (235) -->
+activity, (235) --> act.,
+II (233) -->
+type (226) -->
+immune (225) --> immu.
+transduction (219) --> transduct.
+mediated (218) --> (Delete)
+antigen (216) --> antig.
+activation (214) --> activat.
+mitochondrial (213) --> mito.
+specification (210) --> specif.
+ligase (209) -->
+nuclear (208) --> nucl.
+processing (205) --> proc.
+migration (204) --> migrat.
+histone (203) -->
+the (202) --> (Delete)
+peptide (199) --> pept.
+hormone (198) --> horm.
+system (194) --> syst.
+hydrolase (192) -->
+polymerase (177) -->
+into (177) --> (Delete)
+modulation (176) --> modulat.
+wall (174) -->
+induction (169) --> induc.
+vesicle (166) -->
+localization (165) --> localiz.
+I (164) -->
+B (160) -->
+cycle (158) -->
+maintenance (156) --> maint.
+channel (155) -->
+with (155) --> (Delete)
+commitment (154) --> commit.
+ATPase (148) -->
+oxidase (142) -->
+mRNA (141) -->
+detection (139) --> detect.
+epithelial (138) --> epithel.
+nucleus (134) --> nucl.
+establishment (132) --> establ.
+cardiac (130) -->
+acting (130) --> (Delete)
+calcium (130) --> Ca
+oxidoreductase (129) -->
+mitotic (129) -->
+neuron (129) -->
+gland (128) -->
+nerve (127) -->
+body (123) -->
+as (122) --> (Delete)
+phosphorylation (122) --> phosphoryl.
+homeostasis (121) -->
+meiotic (120) -->
+symporter (119) --> symport.
+phosphatase (119) -->
+nucleotide (117) --> nucleot.
+rRNA (117) -->
+heart (116) -->
+plasma (116) -->
+apoptosis (116) -->
+modification (115) --> modific.
+adhesion (111) -->
+contraction (110) -->
+presentation (110) -->
+maturation (110) --> matur.
+spindle (106) -->
+class (106) -->
+blood (105) -->
+initiation (102) --> init.
+lateral (101) --> lat.
+viral (100) -->
+purine (99) -->
+determination (99) --> det.
+near (98) -->
+tissue (98) -->
+lipoprotein (98) --> lipoprot.
+microtubule (97) -->
+MHC (96) -->
+fusion (96) -->
+Golgi (95) -->
+promoter (95) -->
+import (95) -->
+lipid (95) -->
+skeletal (94) -->
+embryonic (94) -->
+axon (93) -->
+granule (93) -->
+virus (93) -->
+nucleoside (92) -->
+decarboxylase (91) -->
+gene (90) -->
+synaptic (90) -->
+fatty (90) -->
+tolerance (90) -->
+chromosome (89) -->
+G-protein (89) -->
+filament (88) -->
+glutamate (87) -->
+actin (86) -->
+pyrimidine (86) -->
+defense (85) -->
+elongation (85) -->
+active (84) -->
+tRNA (84) -->
+neural (83) -->
+replication (81) --> replic.
+structural (80) --> struct.
+systemic (80) -->
+tyrosine (80) -->
+smooth (79) -->
+adaptor (79) -->
+methylation (79) -->
+chemotaxis (79) -->
+dioxygenase (78) -->
+monooxygenase (78) -->
+incorporation (78) -->
+lyase (77) -->
+eye (77) -->
+defense-related (77) -->
+chromatin (76) -->
+domain (76) -->
+cytokine (76) -->
+light (76) -->
+a (76) -->
+inflammatory (75) -->
+pattern (75) -->
+diphosphate (75) -->
+methyltransferase (74) -->
+phosphate (74) -->
+immunoglobulin (74) -->
+cross-linking (74) -->
+uptake (73) -->
+bud (73) -->
+acceptor (73) -->
+plate (73) -->
