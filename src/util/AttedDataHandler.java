@@ -50,10 +50,10 @@ public class AttedDataHandler {
     static SortedSet<CoExpRelation> sortedEdgeSet = new TreeSet<CoExpRelation>(new Comparator<CoExpRelation>() {
 
         public int compare(CoExpRelation e1, CoExpRelation e2) {
-            int e1v1 = ((BioObject) e1.getGene1()).getId();
-            int e1v2 = ((BioObject) e1.getGene2()).getId();
-            int e2v1 = ((BioObject) e2.getGene1()).getId();
-            int e2v2 = ((BioObject) e2.getGene2()).getId();
+            int e1v1 = ((BioObject) e1.getBioObj1()).getId();
+            int e1v2 = ((BioObject) e1.getBioObj2()).getId();
+            int e2v1 = ((BioObject) e2.getBioObj1()).getId();
+            int e2v2 = ((BioObject) e2.getBioObj2()).getId();
 //                System.out.println(e1v1 + " " + e1v2);
 //                System.out.println(e2v1 + " " + e2v2);
 
@@ -365,7 +365,7 @@ public class AttedDataHandler {
 //
 ////        for (Object obj : coexpMap){
 ////            CoExpRelation coexp = (CoExpRelation)obj;
-////            System.out.println(coexp.getGene1()+"\t"+coexp.getGene2()+"\t"+coexp.getMutualRank()+"\t"+coexp.getPearson());
+////            System.out.println(coexp.getBioObj1()+"\t"+coexp.getBioObj2()+"\t"+coexp.getMutualRank()+"\t"+coexp.getPearson());
 ////        }
 ////        System.out.println(geneSet.contains("At1g54040"));
 //    }
@@ -446,14 +446,14 @@ public class AttedDataHandler {
         pw.println("*Edges\t" + sortedEdgeSet.size());
 
 //        for (CoExpRelation coexp : coexpMap.values()){
-//            pw.println(coexp.getGene1().getName()+"\t"+coexp.getGene2().getName()+"\t"+coexp.getMutualRank()+"\t"+coexp.getPearson());
+//            pw.println(coexp.getBioObj1().getName()+"\t"+coexp.getBioObj2().getName()+"\t"+coexp.getMutualRank()+"\t"+coexp.getPearson());
 //        }
 
 
         for (CoExpRelation edge : sortedEdgeSet) {
 //        for (CoExpRelation edge : coexpMap.values()) {
-            int first = ((BioObject) edge.getGene1()).getId();
-            int second = ((BioObject) edge.getGene2()).getId();
+            int first = ((BioObject) edge.getBioObj1()).getId();
+            int second = ((BioObject) edge.getBioObj2()).getId();
 //            int temp;
 //            if (first > second) {
 //                temp = first;
@@ -461,7 +461,7 @@ public class AttedDataHandler {
 //                second = temp;
 //            }
 //            pw.println(((BioObject)edge.getBait()).getId()+" "+((BioObject)edge.getHit()).getId()+" "+edge.getNumEvidence());
-//            pw.print(first + "\t" + second + "\t" + edge.getMutualRank() + "\t" + edge.getGene1().getName() + "\t" + edge.getGene2().getName());
+//            pw.print(first + "\t" + second + "\t" + edge.getMutualRank() + "\t" + edge.getBioObj1().getName() + "\t" + edge.getBioObj2().getName());
             pw.print(first + "\t" + second + "\t" + edge.getMutualRank() + "\t");
             int ind = 0;
 

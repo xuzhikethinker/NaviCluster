@@ -460,11 +460,11 @@ public class PropInfoProcessor {
 //            }
 //            
         if (foundNullTerm) {
-            NaviClusterApp.pw.println("=== Null Term List ===");
+            MainApp.pw.println("=== Null Term List ===");
             for (String id : setOfNullTerm) {
-                NaviClusterApp.pw.print(id + "\t");
+                MainApp.pw.print(id + "\t");
             }
-            NaviClusterApp.pw.println("\n======================");
+            MainApp.pw.println("\n======================");
             JOptionPane.showMessageDialog(null, "Some of the property terms annotated to the nodes of the current network disappear from the property information file.\n"
                     + "The network was clustered using other available terms, but the result might not be reliable.\n"
                     + "Please check your network files and the property information file, and run NaviCluster again. (Please see the log file for the mismatched terms) ", "Warning", JOptionPane.WARNING_MESSAGE);

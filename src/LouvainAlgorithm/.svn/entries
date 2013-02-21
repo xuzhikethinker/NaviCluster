@@ -26,6 +26,29 @@ add
 
 41c5a7f8-2931-4610-8c64-9b6ca5e0e7aa
 
+LouvainClusterer.java
+file
+
+
+
+add
+
+d04142ae65dedd2b369cc1efed19973a
+
+
+
+
+
+
+
+
+
+
+
+copied
+https://takagilab.cb.k.u-tokyo.ac.jp/svn/repos/trunk/src/main/LouvainClusterer.java
+32
+
 LouvainGraph.java
 file
 
@@ -70,97 +93,5 @@ f879c4a0b3dda5553cd47919fc279e47
 
 copied
 https://takagilab.cb.k.u-tokyo.ac.jp/svn/repos/trunk/src/main/MainLouvain.java
-32
-
-LouvainClustererTest_20090330.java.txt
-file
-
-
-
-add
-
-be64caf931e5b176d308001524cdaee7
-
-
-
-
-
-
-
-
-
-
-
-copied
-https://takagilab.cb.k.u-tokyo.ac.jp/svn/repos/trunk/src/main/LouvainClustererTest_20090330.java.txt
-32
-
-LouvainClusterer.java
-file
-
-
-
-add
-
-d04142ae65dedd2b369cc1efed19973a
-
-
-
-
-
-
-
-
-
-
-
-copied
-https://takagilab.cb.k.u-tokyo.ac.jp/svn/repos/trunk/src/main/LouvainClusterer.java
-32
-
-LouvainClustererTest v1.1.java.txt
-file
-
-
-
-add
-
-050dfb1bc95198790c4656bbb0b025c3
-
-
-
-
-
-
-
-
-
-
-
-copied
-https://takagilab.cb.k.u-tokyo.ac.jp/svn/repos/trunk/src/main/LouvainClustererTest%20v1.1.java.txt
-32
-
-LouvainClustererTest v1.2.java.txt
-file
-
-
-
-add
-
-442a12028c205328fffcc3bc9f39ed60
-
-
-
-
-
-
-
-
-
-
-
-copied
-https://takagilab.cb.k.u-tokyo.ac.jp/svn/repos/trunk/src/main/LouvainClustererTest%20v1.2.java.txt
 32
 

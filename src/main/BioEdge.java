@@ -1,13 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package main;
 
 /**
  *
- * @author knacky
+ * @author Thanet (Knack) Praneenararat, Department of Computational Biology, The University of Tokyo
  */
 public class BioEdge {
     protected BioObject node1;
@@ -20,14 +16,10 @@ public class BioEdge {
         this.node2 = node2;
     }
 
-    public BioEdge(BioObject node1, BioObject node2,double weight) {
+    public BioEdge(BioObject node1, BioObject node2, double weight) {
         this.node1 = node1;
         this.node2 = node2;
         this.weight = weight;
-    }
-
-    public String toString(){
-        return node1+"<->"+node2;
     }
 
     public BioObject getNode1() {
@@ -88,20 +80,9 @@ public class BioEdge {
         if (this.node2 != other.node2 && (this.node2 == null || !this.node2.equals(other.node2))) {
             return false;
         }
-//        if (this.weight != other.weight) {
-//            return false;
-//        }
+
         return true;
     }
-//
-//    @Override
-//    public int hashCode() {
-//        int hash = 7;
-//        hash = 97 * hash + (this.node1 != null ? this.node1.hashCode() : 0);
-//        hash = 97 * hash + (this.node2 != null ? this.node2.hashCode() : 0);
-//        hash = 97 * hash + (int) (Double.doubleToLongBits(this.weight) ^ (Double.doubleToLongBits(this.weight) >>> 32));
-//        return hash;
-//    }
 
     @Override
     public int hashCode() {
@@ -109,6 +90,10 @@ public class BioEdge {
         hash = 89 * hash + (this.node1 != null ? this.node1.hashCode() : 0);
         hash = 89 * hash + (this.node2 != null ? this.node2.hashCode() : 0);
         return hash;
+    }
+    
+     public String toString(){
+        return node1+"<->"+node2;
     }
 
 
