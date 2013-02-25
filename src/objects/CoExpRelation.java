@@ -1,5 +1,7 @@
 
-package main;
+package objects;
+
+import objects.BioObject;
 
 /**
  *

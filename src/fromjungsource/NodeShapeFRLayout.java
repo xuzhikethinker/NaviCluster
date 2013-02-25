@@ -31,11 +31,11 @@ import edu.uci.ics.jung.graph.util.Pair;
 import edu.uci.ics.jung.visualization.decorators.AbstractVertexShapeTransformer;
 import java.util.Collection;
 import java.util.Set;
-import main.BioEdge;
-import main.BioObject;
-import main.MetaEdge;
-import main.PropertyEdge;
-import main.SGDInteraction;
+import objects.BioEdge;
+import objects.BioObject;
+import objects.MetaEdge;
+import objects.PropertyEdge;
+import objects.SGDInteraction;
 
 /**
  * Implements the Fruchterman-Reingold algorithm for node layout.

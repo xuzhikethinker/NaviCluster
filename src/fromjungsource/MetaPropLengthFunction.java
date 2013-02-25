@@ -5,9 +5,9 @@
 
 package fromjungsource;
 
-import main.MetaEdge;
-import main.PropertyEdge;
-import main.SGDInteraction;
+import objects.MetaEdge;
+import objects.PropertyEdge;
+import objects.SGDInteraction;
 import org.apache.commons.collections15.Transformer;
 
 /**

@@ -23,6 +23,13 @@ package main;
  *
  * @author Thanet Praneenararat
  */
+import objects.SGDInteraction;
+import objects.PropertyTerm;
+import objects.PropertyEdge;
+import objects.NameSpace;
+import objects.MetaEdge;
+import objects.BioObject;
+import objects.BioEdge;
 import LouvainAlgorithm.MainLouvain;
 // import com.apple.eawt.AppEvent.QuitEvent;
 // import com.apple.eawt.Application;
@@ -970,7 +977,7 @@ public class MainApp extends JFrame {
             zoomInButton.setEnabled(true);
         }
 
-//        System.out.println("GO Proc size: " + curGOP.clusterScoreMap.size());
+//        System.out.println("GO Proc size: " + curGOP.objectTermScoreMap.size());
 //        zoomOutButton.setEnabled(true);
 //        backButton.setEnabled(true);
     }
@@ -1441,7 +1448,7 @@ public class MainApp extends JFrame {
             System.out.println("New cSet which comprises BioObjects: " + newset);
 
             gp.populatePropTerms(newset);
-            semanticClusterList = gp.preCluster(newset, Integer.parseInt(thresholdTextField.getValue().toString()));
+            semanticClusterList = gp.preKMeansCluster(newset, Integer.parseInt(thresholdTextField.getValue().toString()));
             cSet = transformDataClusterList(semanticClusterList, isTopLevel, doOnAllNodesInCanVas);
 
 //            System.out.println("cSet after transform "+cSet);
@@ -1457,7 +1464,7 @@ public class MainApp extends JFrame {
         } else if (cSet.size() >= Integer.parseInt(thresholdTextField.getValue().toString())) {
             pw.println("Start property-based clustering!");
             System.out.println("Start property-based clustering!");
-            semanticClusterList = gp.preCluster(comNodeClustToFlatClust, comNodeCSet, cSet, Integer.parseInt(thresholdTextField.getValue().toString()));
+            semanticClusterList = gp.preKMeansCluster(comNodeClustToFlatClust, comNodeCSet, cSet, Integer.parseInt(thresholdTextField.getValue().toString()));
             cSet = transformDataClusterList(semanticClusterList, isTopLevel, doOnAllNodesInCanVas);
             pw.println("End property-based clustering!");
             System.out.println("End property-based clustering!");
@@ -1524,14 +1531,14 @@ public class MainApp extends JFrame {
             } while (true);
 
             gp.populatePropTerms(cSet);
-            nodesPropVectorMap.putAll(putInNodesPropVectorMapRelatively(gp.getNodesPropVectorMapBeforeCluster(cSet)));
+            nodesPropVectorMap.putAll(putInNodesPropVectorMapRelatively(gp.getNodesPropVectorMapBeforeClustering(cSet)));
 
         }
 
         if (doOnAllNodesInCanVas) {
             curGOP = gp;
-            pw.println("Prop Term Processor clusterScoreMap size: " + curGOP.clusterScoreMap.size());
-            System.out.println("Prop Term Processor clusterScoreMap size: " + curGOP.clusterScoreMap.size());
+            pw.println("Prop Term Processor clusterScoreMap size: " + curGOP.objectTermScoreMap.size());
+            System.out.println("Prop Term Processor clusterScoreMap size: " + curGOP.objectTermScoreMap.size());
         } else {
             /* if do not run on all nodes, assume that it runs on peripheral nodes */
             curGOPCentered = gp;
@@ -2702,8 +2709,8 @@ public class MainApp extends JFrame {
                 maxBioEdgeWeight = vh.getMaxBioEdge();
                 minBioEdgeWeight = vh.getMinBioEdge();
                 statusBar.addCurrentStatToText(vh.getNumNodesInCurrentGraphView());
-//                    System.out.println("GO Proc size: "+curGOP.clusterScoreMap.size());
-//                    System.out.println("GO Proc: "+curGOP.clusterScoreMap);
+//                    System.out.println("GO Proc size: "+curGOP.objectTermScoreMap.size());
+//                    System.out.println("GO Proc: "+curGOP.objectTermScoreMap);
 
 //                layout.setGraph(dynamicGraph);
 //                layout = (AggregateLayout<Object, Object>) vh.getLayout();
@@ -2850,8 +2857,8 @@ public class MainApp extends JFrame {
                 maxBioEdgeWeight = vh.getMaxBioEdge();
                 minBioEdgeWeight = vh.getMinBioEdge();
                 statusBar.addCurrentStatToText(vh.getNumNodesInCurrentGraphView());
-//                    System.out.println("GO Proc size: "+curGOP.clusterScoreMap.size());
-//                    System.out.println("GO Proc: "+curGOP.clusterScoreMap);
+//                    System.out.println("GO Proc size: "+curGOP.objectTermScoreMap.size());
+//                    System.out.println("GO Proc: "+curGOP.objectTermScoreMap);
 
 //                layout.setGraph(dynamicGraph);
 //                layout = (AggregateLayout<Object, Object>) vh.getLayout();
@@ -2920,7 +2927,7 @@ public class MainApp extends JFrame {
                 highlightedNode = vh.getHighlightedNode();
                 highlightedNodeFormerColor = vh.getHighlightedNodeFormerColor();
 
-//        System.out.println("GO Proc size: " + curGOP.clusterScoreMap.size());
+//        System.out.println("GO Proc size: " + curGOP.objectTermScoreMap.size());
 
                 /* changed 15 Jun 09 */
                 curCSet = vh.getCSet();
@@ -2957,8 +2964,8 @@ public class MainApp extends JFrame {
                 minBioEdgeWeight = vh.getMinBioEdge();
                 statusBar.addCurrentStatToText(vh.getNumNodesInCurrentGraphView());
 
-//                    System.out.println("GO Proc size: "+curGOP.clusterScoreMap.size());
-//                    System.out.println("GO Proc: "+curGOP.clusterScoreMap);
+//                    System.out.println("GO Proc size: "+curGOP.objectTermScoreMap.size());
+//                    System.out.println("GO Proc: "+curGOP.objectTermScoreMap);
 
 //                layout.setGraph(dynamicGraph);
 //                layout = (AggregateLayout<Object, Object>) vh.getLayout();
@@ -3067,8 +3074,8 @@ public class MainApp extends JFrame {
                 } else {
                     centerNodeSet = new HashSet(vh.getRecenteredNodes());
                 }
-//                    System.out.println("GO Proc size: "+curGOP.clusterScoreMap.size());
-//                    System.out.println("GO Proc: "+curGOP.clusterScoreMap);
+//                    System.out.println("GO Proc size: "+curGOP.objectTermScoreMap.size());
+//                    System.out.println("GO Proc: "+curGOP.objectTermScoreMap);
 
 //                layout.setGraph(dynamicGraph);
 //                layout = (AggregateLayout<Object, Object>) vh.getLayout();
@@ -3778,8 +3785,8 @@ public class MainApp extends JFrame {
 //                    curGOP = propInfoProc;
                     vv.getRenderContext().getPickedEdgeState().clear();
                     vv.getRenderContext().getPickedVertexState().clear();
-//                    nodesPropVectorMap.putAll(putInNodesPropVectorMapRelatively(propInfoProc.getNodesPropVectorMapBeforeCluster(cSet)));
-                    nodesPropVectorMap.putAll(gp.getNodesPropVectorMapBeforeCluster(cSet));
+//                    nodesPropVectorMap.putAll(putInNodesPropVectorMapRelatively(propInfoProc.getNodesPropVectorMapBeforeClustering(cSet)));
+                    nodesPropVectorMap.putAll(gp.getNodesPropVectorMapBeforeClustering(cSet));
                     dynamicGraph = createGraph(cSet);
                     usualNodeToClusterMap = new HashMap(nodeToClusterMap);
 
@@ -4983,7 +4990,7 @@ public class MainApp extends JFrame {
 //        viewhist.setNodeToClusterMap(nodeToClusterMap);
 //        viewhist.setUsualNodeToClusterMap(usualNodeToClusterMap);
 
-//        System.out.println("GO Proc size: " + curGOP.clusterScoreMap.size());
+//        System.out.println("GO Proc size: " + curGOP.objectTermScoreMap.size());
         zoomOutButton.setEnabled(true);
         backButton.setEnabled(true);
         forwardButton.setEnabled(false);
@@ -5136,7 +5143,7 @@ public class MainApp extends JFrame {
 
             gp.populatePropTerms(cSet);
             curGOP = gp;
-            nodesPropVectorMap.putAll(putInNodesPropVectorMapRelatively(gp.getNodesPropVectorMapBeforeCluster(cSet)));
+            nodesPropVectorMap.putAll(putInNodesPropVectorMapRelatively(gp.getNodesPropVectorMapBeforeClustering(cSet)));
             if (lastLevel) {
 //                viewhist.setIsLastLevel(true);
                 /* 2011/5 Thanet    commented out according to Nalapro source code; it may not be real last level  */
@@ -5644,15 +5651,15 @@ public class MainApp extends JFrame {
                             } else if (e1.getValue() < e2.getValue()) {
                                 return 1;
                             } else {
-                                PropertyTerm p1 = PropInfoProcessor.propTermsMap.get(e1.getKey());
-                                PropertyTerm p2 = PropInfoProcessor.propTermsMap.get(e2.getKey());
+                                PropertyTerm p1 = PropInfoProcessor.idPropTermsMap.get(e1.getKey());
+                                PropertyTerm p2 = PropInfoProcessor.idPropTermsMap.get(e2.getKey());
                                 if (p1.getWeight() > p2.getWeight()) {
                                     return -1;
                                 } else if (p1.getWeight() < p2.getWeight()) {
                                     return 1;
                                 } else {
-                                    String name1 = PropInfoProcessor.propTermsMap.get(e1.getKey()).getName();
-                                    String name2 = PropInfoProcessor.propTermsMap.get(e2.getKey()).getName();
+                                    String name1 = PropInfoProcessor.idPropTermsMap.get(e1.getKey()).getName();
+                                    String name2 = PropInfoProcessor.idPropTermsMap.get(e2.getKey()).getName();
                                     return name1.compareTo(name2);
                                 }
 
@@ -5690,20 +5697,20 @@ public class MainApp extends JFrame {
 //                System.out.println("------");
 //                int ind = 0;
 //                for (Entry<String,Double> entry : propScoreMap){
-//                    System.out.println("term "+PropInfoProcessor.propTermsMap.get(entry.getKey()).getName()+" score "+entry.getValue());
+//                    System.out.println("term "+PropInfoProcessor.idPropTermsMap.get(entry.getKey()).getName()+" score "+entry.getValue());
 //                    ind++;
 //                    if (ind == 10)
 //                        break;
 //                }
                 Iterator<Entry<String, Double>> iter = propScoreMap.iterator();
 
-                PropertyTerm propTerm = PropInfoProcessor.propTermsMap.get((String) iter.next().getKey());
+                PropertyTerm propTerm = PropInfoProcessor.idPropTermsMap.get((String) iter.next().getKey());
 //                System.out.println("propTerm "+propTerm.getName());
-//                PropertyTerm propTerm = PropInfoProcessor.propTermsMap.get((String) propScoreMap.iterator().next().getKey());
+//                PropertyTerm propTerm = PropInfoProcessor.idPropTermsMap.get((String) propScoreMap.iterator().next().getKey());
 //                while ((iter.hasNext()) && (((propTerm.getName().equalsIgnoreCase("molecular_function")) || (propTerm.getName().equalsIgnoreCase("cellular_component"))
 //                        || (propTerm.getName().equalsIgnoreCase("biological_process"))))){
 ////                    iter.next();
-//                    propTerm = PropInfoProcessor.propTermsMap.get((String) iter.next().getKey());
+//                    propTerm = PropInfoProcessor.idPropTermsMap.get((String) iter.next().getKey());
 ////                    System.out.println("propTerm "+propTerm.getName());
 //                }
 
@@ -5713,14 +5720,14 @@ public class MainApp extends JFrame {
 //                    {
 //                    Iterator<Entry<String, Double>> iter = propScoreMap.iterator();
 //                        System.out.println("iter: "+iter.next());
-//                    propTerm = PropInfoProcessor.propTermsMap.get((String) iter.next().getKey());
+//                    propTerm = PropInfoProcessor.idPropTermsMap.get((String) iter.next().getKey());
 //                    System.out.println("PropertyTerm: "+propTerm);
 //                }
                 stList.add(propTerm);
 //                System.out.println("");
 //                for (Entry<String,Double> entry :propScoreMap)
 //                {
-//                    PropertyTerm term = PropInfoProcessor.propTermsMap.get(entry.getKey());
+//                    PropertyTerm term = PropInfoProcessor.idPropTermsMap.get(entry.getKey());
 //                    System.out.println("term "+term.getName());
 //                }
 //                System.out.println("-------------");
@@ -5791,7 +5798,7 @@ public class MainApp extends JFrame {
                             foundNull = true;
                             stop = true;
                         } else {
-                            PropertyTerm propTerm = PropInfoProcessor.propTermsMap.get((String) propScoreMap[i].getKey());
+                            PropertyTerm propTerm = PropInfoProcessor.idPropTermsMap.get((String) propScoreMap[i].getKey());
                             if (propTerm != null) {
 
                                 tempList.add(propTerm);
@@ -5828,7 +5835,7 @@ public class MainApp extends JFrame {
                         } else {
                             Entry<String, Double>[] propScoreMap = (Entry<String, Double>[]) sortedNodesPropScoreMap.get(vertex).toArray(new Entry[0]);
                             if (propScoreMap.length > 1) {
-                                nodesLabelList.get(vertex).set(1, PropInfoProcessor.propTermsMap.get((String) propScoreMap[1].getKey()));
+                                nodesLabelList.get(vertex).set(1, PropInfoProcessor.idPropTermsMap.get((String) propScoreMap[1].getKey()));
                             } else {
                                 nodesLabelList.get(vertex).set(1, null);
                             }
@@ -5883,15 +5890,15 @@ public class MainApp extends JFrame {
                         } else if (e1.getValue() < e2.getValue()) {
                             return 1;
                         } else {
-                            PropertyTerm p1 = PropInfoProcessor.propTermsMap.get(e1.getKey());
-                            PropertyTerm p2 = PropInfoProcessor.propTermsMap.get(e2.getKey());
+                            PropertyTerm p1 = PropInfoProcessor.idPropTermsMap.get(e1.getKey());
+                            PropertyTerm p2 = PropInfoProcessor.idPropTermsMap.get(e2.getKey());
                             if (p1.getWeight() > p2.getWeight()) {
                                 return -1;
                             } else if (p1.getWeight() < p2.getWeight()) {
                                 return 1;
                             } else {
-                                String name1 = PropInfoProcessor.propTermsMap.get(e1.getKey()).getName();
-                                String name2 = PropInfoProcessor.propTermsMap.get(e2.getKey()).getName();
+                                String name1 = PropInfoProcessor.idPropTermsMap.get(e1.getKey()).getName();
+                                String name2 = PropInfoProcessor.idPropTermsMap.get(e2.getKey()).getName();
                                 return name1.compareTo(name2);
                             }
 
@@ -5908,7 +5915,7 @@ public class MainApp extends JFrame {
                 int i = 0;
                 for (Entry entry : sortedMap) {
 
-                    PropertyTerm propTerm = PropInfoProcessor.propTermsMap.get((String) entry.getKey());
+                    PropertyTerm propTerm = PropInfoProcessor.idPropTermsMap.get((String) entry.getKey());
                     String toPrint = propTerm.getName();
 //                    System.out.println("entry "+entry.getKey()+" value "+entry.getValue());
 //                    if ((toPrint.equalsIgnoreCase("molecular_function")) || (toPrint.equalsIgnoreCase("biological_process"))
@@ -6792,7 +6799,7 @@ public class MainApp extends JFrame {
             double value = 1;
             String res = "<html><p style=\"font-size:103%;color:#6E6E6E\">";
             if (e instanceof MetaEdge) {
-                value = ((MetaEdge) e).numEdgeSetBundled;
+                value = ((MetaEdge) e).getNumEdgeSetBundled();
 //                value = ((MetaEdge) e).getWeightedNumEdges();
 //                return "" + String.format("%.3f", value);
 //                return "" + String.format("%d", (int) value);
@@ -7305,15 +7312,15 @@ public class MainApp extends JFrame {
                                 } else if (e1.getValue() < e2.getValue()) {
                                     return 1;
                                 } else {
-                                    PropertyTerm p1 = PropInfoProcessor.propTermsMap.get(e1.getKey());
-                                    PropertyTerm p2 = PropInfoProcessor.propTermsMap.get(e2.getKey());
+                                    PropertyTerm p1 = PropInfoProcessor.idPropTermsMap.get(e1.getKey());
+                                    PropertyTerm p2 = PropInfoProcessor.idPropTermsMap.get(e2.getKey());
                                     if (p1.getWeight() > p2.getWeight()) {
                                         return -1;
                                     } else if (p1.getWeight() < p2.getWeight()) {
                                         return 1;
                                     } else {
-                                        String name1 = PropInfoProcessor.propTermsMap.get(e1.getKey()).getName();
-                                        String name2 = PropInfoProcessor.propTermsMap.get(e2.getKey()).getName();
+                                        String name1 = PropInfoProcessor.idPropTermsMap.get(e1.getKey()).getName();
+                                        String name2 = PropInfoProcessor.idPropTermsMap.get(e2.getKey()).getName();
                                         return name1.compareTo(name2);
                                     }
 
@@ -7330,7 +7337,7 @@ public class MainApp extends JFrame {
 
                         for (Entry entry : sortedMap) {
 
-                            PropertyTerm propTerm = PropInfoProcessor.propTermsMap.get((String) entry.getKey());
+                            PropertyTerm propTerm = PropInfoProcessor.idPropTermsMap.get((String) entry.getKey());
                             String toPrint = propTerm.getName();
 
 //                        if (toPrint.length() > 20) {
@@ -7389,7 +7396,7 @@ public class MainApp extends JFrame {
                     Set set = (Set) ver;
                     PropInfoProcessor gp = new PropInfoProcessor();
                     gp.populatePropTerms(set);
-                    Map<Object, DataVector> propVecMap = new HashMap<Object, DataVector>(putInNodesPropVectorMapRelatively(gp.getNodesPropVectorMapBeforeCluster(set)));
+                    Map<Object, DataVector> propVecMap = new HashMap<Object, DataVector>(putInNodesPropVectorMapRelatively(gp.getNodesPropVectorMapBeforeClustering(set)));
 //                    String res = "";
                     stb.append("<b>" + (1 + j) + ".</b> Number of nodes inside: <b>" + set.size() + "</b>");
                     for (Object verInSet : set) {
@@ -7417,15 +7424,15 @@ public class MainApp extends JFrame {
                                         } else if (e1.getValue() < e2.getValue()) {
                                             return 1;
                                         } else {
-                                            PropertyTerm p1 = PropInfoProcessor.propTermsMap.get(e1.getKey());
-                                            PropertyTerm p2 = PropInfoProcessor.propTermsMap.get(e2.getKey());
+                                            PropertyTerm p1 = PropInfoProcessor.idPropTermsMap.get(e1.getKey());
+                                            PropertyTerm p2 = PropInfoProcessor.idPropTermsMap.get(e2.getKey());
                                             if (p1.getWeight() > p2.getWeight()) {
                                                 return -1;
                                             } else if (p1.getWeight() < p2.getWeight()) {
                                                 return 1;
                                             } else {
-                                                String name1 = PropInfoProcessor.propTermsMap.get(e1.getKey()).getName();
-                                                String name2 = PropInfoProcessor.propTermsMap.get(e2.getKey()).getName();
+                                                String name1 = PropInfoProcessor.idPropTermsMap.get(e1.getKey()).getName();
+                                                String name2 = PropInfoProcessor.idPropTermsMap.get(e2.getKey()).getName();
                                                 return name1.compareTo(name2);
                                             }
 
@@ -7442,7 +7449,7 @@ public class MainApp extends JFrame {
 
                                 for (Entry entry : sortedMap) {
 
-                                    PropertyTerm propTerm = PropInfoProcessor.propTermsMap.get((String) entry.getKey());
+                                    PropertyTerm propTerm = PropInfoProcessor.idPropTermsMap.get((String) entry.getKey());
                                     String toPrint = propTerm.getName();
 
 //                        if (toPrint.length() > 20) {
@@ -7703,15 +7710,15 @@ public class MainApp extends JFrame {
                             } else if (e1.getValue() < e2.getValue()) {
                                 return 1;
                             } else {
-                                PropertyTerm p1 = PropInfoProcessor.propTermsMap.get(e1.getKey());
-                                PropertyTerm p2 = PropInfoProcessor.propTermsMap.get(e2.getKey());
+                                PropertyTerm p1 = PropInfoProcessor.idPropTermsMap.get(e1.getKey());
+                                PropertyTerm p2 = PropInfoProcessor.idPropTermsMap.get(e2.getKey());
                                 if (p1.getWeight() > p2.getWeight()) {
                                     return -1;
                                 } else if (p1.getWeight() < p2.getWeight()) {
                                     return 1;
                                 } else {
-                                    String name1 = PropInfoProcessor.propTermsMap.get(e1.getKey()).getName();
-                                    String name2 = PropInfoProcessor.propTermsMap.get(e2.getKey()).getName();
+                                    String name1 = PropInfoProcessor.idPropTermsMap.get(e1.getKey()).getName();
+                                    String name2 = PropInfoProcessor.idPropTermsMap.get(e2.getKey()).getName();
                                     return name1.compareTo(name2);
                                 }
 
@@ -7731,7 +7738,7 @@ public class MainApp extends JFrame {
 
                     for (Entry entry : sortedMap) {
 
-                        PropertyTerm propTerm = PropInfoProcessor.propTermsMap.get((String) entry.getKey());
+                        PropertyTerm propTerm = PropInfoProcessor.idPropTermsMap.get((String) entry.getKey());
                         String toPrint = propTerm.getName();
 
 //                        if (toPrint.length() > 20) {
@@ -7916,15 +7923,15 @@ public class MainApp extends JFrame {
                                     } else if (e1.getValue() < e2.getValue()) {
                                         return 1;
                                     } else {
-                                        PropertyTerm p1 = PropInfoProcessor.propTermsMap.get(e1.getKey());
-                                        PropertyTerm p2 = PropInfoProcessor.propTermsMap.get(e2.getKey());
+                                        PropertyTerm p1 = PropInfoProcessor.idPropTermsMap.get(e1.getKey());
+                                        PropertyTerm p2 = PropInfoProcessor.idPropTermsMap.get(e2.getKey());
                                         if (p1.getWeight() > p2.getWeight()) {
                                             return -1;
                                         } else if (p1.getWeight() < p2.getWeight()) {
                                             return 1;
                                         } else {
-                                            String name1 = PropInfoProcessor.propTermsMap.get(e1.getKey()).getName();
-                                            String name2 = PropInfoProcessor.propTermsMap.get(e2.getKey()).getName();
+                                            String name1 = PropInfoProcessor.idPropTermsMap.get(e1.getKey()).getName();
+                                            String name2 = PropInfoProcessor.idPropTermsMap.get(e2.getKey()).getName();
                                             return name1.compareTo(name2);
                                         }
 
@@ -7941,7 +7948,7 @@ public class MainApp extends JFrame {
 
                             for (Entry entry : sortedMap) {
 
-                                PropertyTerm propTerm = PropInfoProcessor.propTermsMap.get((String) entry.getKey());
+                                PropertyTerm propTerm = PropInfoProcessor.idPropTermsMap.get((String) entry.getKey());
                                 String toPrint = propTerm.getName();
 
 //                        if (toPrint.length() > 20) {

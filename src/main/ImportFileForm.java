@@ -1,5 +1,7 @@
 package main;
 
+import objects.BioObject;
+import objects.BioEdge;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.SparseMultigraph;
 import java.io.BufferedReader;
@@ -599,8 +601,8 @@ public class ImportFileForm extends JDialog implements ActionListener {
             wArr = new double[network.getEdgeCount()];
             int i = 0;
             for (BioEdge edge : sortedSet) {
-                sArr[i] = hNodeID.get(((BioEdge) edge).node1.toString());
-                dArr[i] = hNodeID.get(((BioEdge) edge).node2.toString());
+                sArr[i] = hNodeID.get(((BioEdge) edge).getNode1().toString());
+                dArr[i] = hNodeID.get(((BioEdge) edge).getNode2().toString());
                 wArr[i] = ((BioEdge) edge).getWeight();
                 i++;
             }

@@ -313,7 +313,7 @@
 
                       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
                       <SubComponents>
-                        <Component class="javax.swing.JList" name="allNodesInViewJList">
+                        <Component class="javax.swing.JList" name="nodesClustersInViewJList">
                           <Properties>
                             <Property name="model" type="javax.swing.ListModel" editor="org.netbeans.modules.form.editors2.ListModelEditor">
                               <StringArray count="1">
@@ -322,6 +322,7 @@
                             </Property>
                           </Properties>
                           <AuxValues>
+                            <AuxValue name="JavaCodeGenerator_DeclarationPre" type="java.lang.String" value="/* nodesClustersInViewJList is a JList of nodesClustersInViewSet */"/>
                             <AuxValue name="JavaCodeGenerator_SerializeTo" type="java.lang.String" value="CreateGraphFromNodeSetDialog_jList2"/>
                           </AuxValues>
                         </Component>
@@ -339,14 +340,17 @@
 
                       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
                       <SubComponents>
-                        <Component class="javax.swing.JList" name="allPrimInViewJList">
+                        <Component class="javax.swing.JList" name="nodesInsideClusterJList">
                           <Properties>
                             <Property name="model" type="javax.swing.ListModel" editor="org.netbeans.modules.form.editors2.ListModelEditor">
                               <StringArray count="1">
-                                <StringItem index="0" value="&lt;html&gt;&lt;b&gt;All nodes in the current view&lt;/b&gt;&lt;/html&gt;"/>
+                                <StringItem index="0" value="&lt;html&gt;&lt;b&gt;All nodes inside clusters in the current view&lt;/b&gt;&lt;/html&gt;"/>
                               </StringArray>
                             </Property>
                           </Properties>
+                          <AuxValues>
+                            <AuxValue name="JavaCodeGenerator_DeclarationPre" type="java.lang.String" value="/* nodesInsideClusterJList is a JList of nodesInsideClusterSet*/ "/>
+                          </AuxValues>
                         </Component>
                       </SubComponents>
                     </Container>
@@ -387,15 +391,18 @@
 
                   <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
                   <SubComponents>
-                    <Component class="javax.swing.JList" name="allOtherPrimJList">
+                    <Component class="javax.swing.JList" name="nodesOutsideViewJList">
                       <Properties>
                         <Property name="model" type="javax.swing.ListModel" editor="org.netbeans.modules.form.editors2.ListModelEditor">
                           <StringArray count="1">
-                            <StringItem index="0" value="&lt;html&gt;&lt;b&gt;All other nodes not in the current view&lt;/b&gt;&lt;/html&gt;"/>
+                            <StringItem index="0" value="&lt;html&gt;&lt;b&gt;All nodes NOT in the current view&lt;/b&gt;&lt;/html&gt;"/>
                           </StringArray>
                         </Property>
                         <Property name="name" type="java.lang.String" value="" noResource="true"/>
                       </Properties>
+                      <AuxValues>
+                        <AuxValue name="JavaCodeGenerator_DeclarationPre" type="java.lang.String" value="/* nodesOutsideViewJList is a JList of nodesOutsideViewSet*/"/>
+                      </AuxValues>
                     </Component>
                   </SubComponents>
                 </Container>

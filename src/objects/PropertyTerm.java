@@ -1,10 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+package objects;
 
-package main;
-
+import objects.NameSpace;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,17 +10,29 @@ import java.util.Set;
  *              Make all fields "private"
  * 2010/06/1    Change Namespace from enum to class
  *
- * @author Knacky
+ * @author Thanet (Knack) Praneenararat, Department of Computational Biology, The University of Tokyo
  */
-public class PropertyTerm extends Object{
+public class PropertyTerm {
     private String id = "";
     private String name = "";
     private String shortName = "";
-    // Weight specified here is like "depth" for terms in any ontology hierarchy
+    // Weight specified here is like "depth" for terms in an ontology hierarchy
     private int weight = 0;
 //    private NameSpace namespace = NameSpace.ALL;
     private NameSpace namespace = new NameSpace();
     private Set<String> parents = new HashSet<String>();
+
+    public PropertyTerm(String id) {
+        this.id = id;
+    }
+
+    public PropertyTerm(String id, int weight) {
+        this.id = id;
+        this.weight = weight;
+    }
+
+    public PropertyTerm() {
+    }
 
     public NameSpace getNamespace() {
         return namespace;
@@ -33,7 +41,7 @@ public class PropertyTerm extends Object{
     public void setNamespace(NameSpace namespace) {
         this.namespace = namespace;
     }
-    
+
     public int getWeight() {
         return weight;
     }
@@ -65,7 +73,7 @@ public class PropertyTerm extends Object{
     public void setShortName(String shortName) {
         this.shortName = shortName;
     }
-    
+
     public Set<String> getParents() {
         return parents;
     }
@@ -74,12 +82,21 @@ public class PropertyTerm extends Object{
         this.parents = parents;
     }
 
-    public void addParent(String parent){
+    public void addParent(String parent) {
         this.parents.add(parent);
     }
 
-    public void removeParent(String parent){
+    public void removeParent(String parent) {
         this.parents.remove(parent);
+    }
+
+    public static PropertyTerm findTerm(Set<PropertyTerm> termSet, String id) {
+        for (PropertyTerm term : termSet) {
+            if (id.equals(term.id)) {
+                return term;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -104,28 +121,8 @@ public class PropertyTerm extends Object{
         return hash;
     }
 
-
-
-    public PropertyTerm(String id){
-        this.id = id;
-    }
-    public PropertyTerm(String id, int depth){
-        this.id = id;
-        this.weight = depth;
-    }
-    public PropertyTerm(){
-        
-    }
     @Override
-    public String toString(){
+    public String toString() {
         return id;
-    }
-    
-    public static PropertyTerm findTerm(Set<PropertyTerm> GOSet, String id){
-        for (PropertyTerm term : GOSet){
-            if (id.equals(term.id))
-                return term;
-        }
-        return null;
     }
 }

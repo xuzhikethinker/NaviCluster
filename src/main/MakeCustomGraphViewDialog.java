@@ -1,15 +1,11 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
  * MakeCustomGraphViewDialog.java
  *
  * Created on Jul 3, 2009, 4:14:35 PM
  */
 package main;
 
+import objects.BioObject;
 import edu.uci.ics.jung.graph.Graph;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -31,7 +27,7 @@ import javax.swing.event.DocumentListener;
 
 /**
  *
- * @author Knacky
+ * @author Thanet (Knack) Praneenararat, Department of Computational Biology, The University of Tokyo
  */
 public class MakeCustomGraphViewDialog extends javax.swing.JDialog {
 
@@ -75,62 +71,60 @@ public class MakeCustomGraphViewDialog extends javax.swing.JDialog {
 
     public void loadGraphData() {
 
-
-        otherPrimEntSet.addAll(realGraph.getVertices());
+        nodesOutsideViewSet.addAll(realGraph.getVertices());
         for (Object ver : dynamicGraph.getVertices()) {
             if (ver instanceof Set) {
-                primEntInViewSet.addAll((Set) ver);
+                nodesInsideClusterSet.addAll((Set) ver);
             } else if (ver instanceof BioObject) {
-                primEntSetToBeRemoved.add(ver);
+                nodesOutsideClusterSet.add(ver);
             }
-//            else
-//                primEntInViewSet.add(ver);
-            nodesInViewSet.add(ver);
+            nodesClustersInViewSet.add(ver);
         }
 
-        nodesInViewLM = new DefaultListModel();
-        oriAllNodesInViewLM = new DefaultListModel();
-        nodesInViewLM.addElement("<html><b>All clusters/nodes in the current view: " + nodesInViewSet.size() + " clusters/nodes</b></html>");
-        for (Object ver : nodesInViewSet) {
-            nodesInViewLM.addElement(ver);
-//            oriAllNodesInViewLM.addElement(ver);
+        /* all clusters/nodes in the current view */
+        nodesClustersInViewLM = new DefaultListModel();
+        oriNodesClustersInViewLM = new DefaultListModel();
+        nodesClustersInViewLM.addElement("<html><b>All clusters and nodes in the current view: " + nodesClustersInViewSet.size() + " clusters/nodes</b></html>");
+        for (Object ver : nodesClustersInViewSet) {
+            nodesClustersInViewLM.addElement(ver);
         }
-        for (Enumeration e = nodesInViewLM.elements(); e.hasMoreElements();){
-            oriAllNodesInViewLM.addElement(e.nextElement());
+        for (Enumeration e = nodesClustersInViewLM.elements(); e.hasMoreElements();) {
+            oriNodesClustersInViewLM.addElement(e.nextElement());
         }
-        allNodesInViewJList.setModel(nodesInViewLM);
+        nodesClustersInViewJList.setModel(nodesClustersInViewLM);
 
-        primEntInViewLM = new DefaultListModel();
-        oriAllPrimEntInViewLM = new DefaultListModel();
-        primEntInViewLM.addElement("<html><b>All nodes contained in the clusters of the above list: " + primEntInViewSet.size() + " nodes</b></html>");
-        for (Object ver : primEntInViewSet) {
-            primEntInViewLM.addElement(ver);
-//            oriAllPrimEntInViewLM.addElement(ver);
+        /* all objects insides clusters in the current view */
+        nodesInsideClusterLM = new DefaultListModel();
+        oriNodesInsideClusterLM = new DefaultListModel();
+        nodesInsideClusterLM.addElement("<html><b>All nodes inside clusters in the current view: " + nodesInsideClusterSet.size() + " nodes</b></html>");
+        for (Object ver : nodesInsideClusterSet) {
+            nodesInsideClusterLM.addElement(ver);
         }
-        for (Enumeration e = primEntInViewLM.elements(); e.hasMoreElements();){
-            oriAllPrimEntInViewLM.addElement(e.nextElement());
+        for (Enumeration e = nodesInsideClusterLM.elements(); e.hasMoreElements();) {
+            oriNodesInsideClusterLM.addElement(e.nextElement());
         }
-        allPrimInViewJList.setModel(primEntInViewLM);
+        nodesInsideClusterJList.setModel(nodesInsideClusterLM);
 
-        primEntInViewSetCopy.addAll(primEntInViewSet);
-        // remove all primitive entries which were in the clusters
-        otherPrimEntSet.removeAll(primEntInViewSet);
-        // remove all primitive entries in the current view which were not in the clusters
-        otherPrimEntSet.removeAll(primEntSetToBeRemoved);
+        nodesInsideClusterSetCopy.addAll(nodesInsideClusterSet);
+        // remove all nodes which were in the clusters
+        nodesOutsideViewSet.removeAll(nodesInsideClusterSet);
+        // remove all nodes in the current view which were not in the clusters
+        nodesOutsideViewSet.removeAll(nodesOutsideClusterSet);
 
-        primEntLM = new DefaultListModel();
-        oriAllPrimEntLM = new DefaultListModel();
-        primEntLM.removeAllElements();
-        primEntLM.addElement("<html><b>All other nodes not in this view: " + otherPrimEntSet.size() + " nodes</b></html>");
-        for (Object ver : otherPrimEntSet) {
-            primEntLM.addElement(ver);
-//            oriAllPrimEntLM.addElement(ver);
-        }
-        for (Enumeration e = primEntLM.elements(); e.hasMoreElements();){
-            oriAllPrimEntLM.addElement(e.nextElement());
-        }        
-        allOtherPrimJList.setModel(primEntLM);
+        nodesOutsideViewLM = new DefaultListModel();
+        oriNodesOutsideViewLM = new DefaultListModel();
+        nodesOutsideViewLM.removeAllElements();
         
+        /* all nodes not in the current view and not in clusters in the current view */
+        nodesOutsideViewLM.addElement("<html><b>All nodes NOT in the current view: " + nodesOutsideViewSet.size() + " nodes</b></html>");
+        for (Object ver : nodesOutsideViewSet) {
+            nodesOutsideViewLM.addElement(ver);
+        }
+        for (Enumeration e = nodesOutsideViewLM.elements(); e.hasMoreElements();) {
+            oriNodesOutsideViewLM.addElement(e.nextElement());
+        }
+        nodesOutsideViewJList.setModel(nodesOutsideViewLM);
+
         selectedNodesJList.setModel(selectedNodesLM);
         selectedNodesLM.addElement("<html><b>Selected items: 0 items</b></html>");
         oriSelectedNodesLM.addElement("<html><b>Selected items: 0 items</b></html>");
@@ -165,13 +159,13 @@ public class MakeCustomGraphViewDialog extends javax.swing.JDialog {
         jScrollPane3 = new javax.swing.JScrollPane();
         jTextArea3 = new javax.swing.JTextArea();
         jScrollPane2 = new javax.swing.JScrollPane();
-        allNodesInViewJList = new javax.swing.JList();
+        nodesClustersInViewJList = new javax.swing.JList();
         jScrollPane5 = new javax.swing.JScrollPane();
-        allPrimInViewJList = new javax.swing.JList();
+        nodesInsideClusterJList = new javax.swing.JList();
         jScrollPane4 = new javax.swing.JScrollPane();
         jTextArea4 = new javax.swing.JTextArea();
         jScrollPane6 = new javax.swing.JScrollPane();
-        allOtherPrimJList = new javax.swing.JList();
+        nodesOutsideViewJList = new javax.swing.JList();
         jPanel1 = new javax.swing.JPanel();
         OKButton = new javax.swing.JButton();
         CancelButton = new javax.swing.JButton();
@@ -291,21 +285,21 @@ public class MakeCustomGraphViewDialog extends javax.swing.JDialog {
 
         jSplitPane2.setRightComponent(jScrollPane3);
 
-        allNodesInViewJList.setModel(new javax.swing.AbstractListModel() {
+        nodesClustersInViewJList.setModel(new javax.swing.AbstractListModel() {
             String[] strings = { "<html><b>All clusters and nodes in the current view</b></html>" };
             public int getSize() { return strings.length; }
             public Object getElementAt(int i) { return strings[i]; }
         });
-        jScrollPane2.setViewportView(allNodesInViewJList);
+        jScrollPane2.setViewportView(nodesClustersInViewJList);
 
         jSplitPane2.setLeftComponent(jScrollPane2);
 
-        allPrimInViewJList.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "<html><b>All nodes in the current view</b></html>" };
+        nodesInsideClusterJList.setModel(new javax.swing.AbstractListModel() {
+            String[] strings = { "<html><b>All nodes inside clusters in the current view</b></html>" };
             public int getSize() { return strings.length; }
             public Object getElementAt(int i) { return strings[i]; }
         });
-        jScrollPane5.setViewportView(allPrimInViewJList);
+        jScrollPane5.setViewportView(nodesInsideClusterJList);
 
         jSplitPane2.setBottomComponent(jScrollPane5);
 
@@ -318,13 +312,13 @@ public class MakeCustomGraphViewDialog extends javax.swing.JDialog {
 
         jSplitPane1.setRightComponent(jScrollPane4);
 
-        allOtherPrimJList.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "<html><b>All other nodes not in the current view</b></html>" };
+        nodesOutsideViewJList.setModel(new javax.swing.AbstractListModel() {
+            String[] strings = { "<html><b>All nodes NOT in the current view</b></html>" };
             public int getSize() { return strings.length; }
             public Object getElementAt(int i) { return strings[i]; }
         });
-        allOtherPrimJList.setName(""); // NOI18N
-        jScrollPane6.setViewportView(allOtherPrimJList);
+        nodesOutsideViewJList.setName(""); // NOI18N
+        jScrollPane6.setViewportView(nodesOutsideViewJList);
 
         jSplitPane1.setBottomComponent(jScrollPane6);
 
@@ -444,7 +438,6 @@ public class MakeCustomGraphViewDialog extends javax.swing.JDialog {
 }//GEN-LAST:event_CancelButtonActionPerformed
 
     private void OKButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OKButtonActionPerformed
-        //2011/10/6 Knack
         if (selectedNodesLM.size() <= 1) {
             answerOK = false;
         } else {
@@ -462,56 +455,50 @@ public class MakeCustomGraphViewDialog extends javax.swing.JDialog {
         selectedIndArr = selectedNodesJList.getSelectedIndices();
         start = 0;
         if (selectedIndArr.length > 0) {
-            //        System.out.println("selectedIndArr[0] "+selectedIndArr[0]);
-            if (selectedIndArr[0] == 0) {
+            if (selectedIndArr[0] == 0) 
                 start = 1;
-            }
 
             for (int i = start; i < selectedIndArr.length; i++) {
                 Object item = selectedNodesLM.elementAt(selectedIndArr[i] - (i - start));
                 if (dynamicGraph.containsVertex(item)) {
-                    System.out.println("contain " + item);
-                    nodesInViewSet.add(item);
-                } else if (primEntInViewSetCopy.contains(item)) {
-                    primEntInViewSet.add(item);
+                    nodesClustersInViewSet.add(item);
+                } else if (nodesInsideClusterSetCopy.contains(item)) {
+                    nodesInsideClusterSet.add(item);
                 } else {
-                    otherPrimEntSet.add(item);
+                    nodesOutsideViewSet.add(item);
                 }
-                //            System.out.println("selectedIndArr[i] "+selectedIndArr[i]);
-
-                //            System.out.println("element at "+allPrimEntLM.elementAt(selectedIndArr[i]-(i-start)));
-                //                selectedNodesLM.addElement(allPrimEntLM.elementAt(selectedIndArr[i] - (i - start)));
                 selectedNodesLM.removeElementAt(selectedIndArr[i] - (i - start));
             }
 
             selectedNodesJList.clearSelection();
             selectedNodesLM.set(0, "<html><b>Selected items: " + (selectedNodesLM.size() - 1) + " items</b></html>");
 
-            if (nodesInViewLM.size() > 1) {
-                nodesInViewLM.removeRange(1, nodesInViewLM.getSize() - 1);
+            /* re-populate the list */
+            if (nodesClustersInViewLM.size() > 1) {
+                nodesClustersInViewLM.removeRange(1, nodesClustersInViewLM.getSize() - 1);
             }
-            for (Object ver : nodesInViewSet) {
-                nodesInViewLM.addElement(ver);
+            for (Object ver : nodesClustersInViewSet) {
+                nodesClustersInViewLM.addElement(ver);
             }
-            System.out.println("size all node in view set: " + nodesInViewSet.size());
-            System.out.println("size all node in view LM: " + (nodesInViewLM.size() - 1));
-            nodesInViewLM.set(0, "<html><b>All nodes in the current view: " + (nodesInViewSet.size()) + " nodes</b></html>");
+            nodesClustersInViewLM.set(0, "<html><b>All clusters and nodes in the current view: " + (nodesClustersInViewSet.size()) + " nodes</b></html>");
 
-            if (primEntInViewLM.size() > 1) {
-                primEntInViewLM.removeRange(1, primEntInViewLM.getSize() - 1);
+            /* re-populate the list */
+            if (nodesInsideClusterLM.size() > 1) {
+                nodesInsideClusterLM.removeRange(1, nodesInsideClusterLM.getSize() - 1);
             }
-            for (Object ver : primEntInViewSet) {
-                primEntInViewLM.addElement(ver);
+            for (Object ver : nodesInsideClusterSet) {
+                nodesInsideClusterLM.addElement(ver);
             }
-            primEntInViewLM.set(0, "<html><b>All nodes contained in the clusters of the above list: " + (primEntInViewSet.size()) + " nodes</b></html>");
+            nodesInsideClusterLM.set(0, "<html><b>All nodes inside clusters in the current view: " + (nodesInsideClusterSet.size()) + " nodes</b></html>");
 
-            if (primEntLM.size() > 1) {
-                primEntLM.removeRange(1, primEntLM.getSize() - 1);
+            /* re-populate the list */
+            if (nodesOutsideViewLM.size() > 1) {
+                nodesOutsideViewLM.removeRange(1, nodesOutsideViewLM.getSize() - 1);
             }
-            for (Object ver : otherPrimEntSet) {
-                primEntLM.addElement(ver);
+            for (Object ver : nodesOutsideViewSet) {
+                nodesOutsideViewLM.addElement(ver);
             }
-            primEntLM.set(0, "<html><b>All other nodes not in this view: " + (otherPrimEntSet.size()) + " nodes</b></html>");
+            nodesOutsideViewLM.set(0, "<html><b>All nodes NOT in the current view: " + (nodesOutsideViewSet.size()) + " nodes</b></html>");
 
         }
 
@@ -523,93 +510,71 @@ public class MakeCustomGraphViewDialog extends javax.swing.JDialog {
         int selectedIndArr[];
         int start = 0;
 
-        /* process all nodes JList */
-        selectedIndArr = allNodesInViewJList.getSelectedIndices();
-        System.out.println("selectedIndArr size " + selectedIndArr.length);
-        Set entitiesInMetanodesOfThisViewSet = new HashSet();
+        /* process JList of nodes/clusters in the current view */
+        selectedIndArr = nodesClustersInViewJList.getSelectedIndices();
+        Set nodesInsideClustersOfThisViewSet = new HashSet();
         if (selectedIndArr.length > 0) {
             start = 0;
-            System.out.println("selectedIndArr[0] " + selectedIndArr[0]);
-            // remove the first row, which is a description text
-            if (selectedIndArr[0] == 0) {
+            /* remove the first row, which is a description text */
+            if (selectedIndArr[0] == 0) 
                 start = 1;
-            }
 
             for (int i = start; i < selectedIndArr.length; i++) {
-                System.out.println("selectedIndArr[i] " + selectedIndArr[i]);
-                Object item = nodesInViewLM.elementAt(selectedIndArr[i] - (i - start));
-
-                System.out.println("item " + item);
+                Object item = nodesClustersInViewLM.elementAt(selectedIndArr[i] - (i - start));
                 selectedNodesLM.addElement(item);
-                nodesInViewSet.remove(item);
-                nodesInViewLM.removeElementAt(selectedIndArr[i] - (i - start));
-
+                nodesClustersInViewSet.remove(item);
+                nodesClustersInViewLM.removeElementAt(selectedIndArr[i] - (i - start));
             }
-            allNodesInViewJList.clearSelection();
-            System.out.println("size of all node inview set " + nodesInViewSet.size());
-            nodesInViewLM.set(0, "<html><b>All nodes in the current view: " + (nodesInViewLM.size() - 1) + " nodes</b></html>");
+            nodesClustersInViewJList.clearSelection();
+            nodesClustersInViewLM.set(0, "<html><b>All clusters and nodes in the current view: " + (nodesClustersInViewLM.size() - 1) + " nodes</b></html>");
         }
-
 
         for (Object member : selectedNodesLM.toArray()) {
             if (member instanceof Set) {
-                entitiesInMetanodesOfThisViewSet.addAll((Set) member);
+                nodesInsideClustersOfThisViewSet.addAll((Set) member);
             }
         }
-        /* process entities in metanode JList */
-        // skip used to not redundantly add nodes which are already included in a cluster which is in turn also added
+        
+        /* process JList of nodes inside clusters in the current view */
+        /* skip used to not redundantly add nodes which are already included in a cluster which was already added */
         int skip = 0;
-        selectedIndArr = allPrimInViewJList.getSelectedIndices();
-        //        System.out.println("selectedIndArr size "+selectedIndArr.length);
+        selectedIndArr = nodesInsideClusterJList.getSelectedIndices();
         if (selectedIndArr.length > 0) {
             start = 0;
-            //            System.out.println("selectedIndArr[0] " + selectedIndArr[0]);
-            if (selectedIndArr[0] == 0) {
+            /* remove the first row, which is a description text */
+            if (selectedIndArr[0] == 0) 
                 start = 1;
-            }
 
             for (int i = start; i < selectedIndArr.length; i++) {
-                //                System.out.println("selectedIndArr[i] " + selectedIndArr[i]);
-                //                System.out.println("element at " + allPrimEntInViewLM.elementAt(selectedIndArr[i] - (i - start) + skip));
-                if (entitiesInMetanodesOfThisViewSet.contains(primEntInViewLM.elementAt(selectedIndArr[i] - (i - start) + skip))) {
+                Object item = nodesInsideClusterLM.elementAt(selectedIndArr[i] - (i - start) + skip);
+                if (nodesInsideClustersOfThisViewSet.contains(item)) {
                     skip++;
-
                 } else {
-
-                    selectedNodesLM.addElement(primEntInViewLM.elementAt(selectedIndArr[i] - (i - start) + skip));
-                    primEntInViewSet.remove(primEntInViewLM.elementAt(selectedIndArr[i] - (i - start) + skip));
-                    primEntInViewLM.removeElementAt(selectedIndArr[i] - (i - start) + skip);
-
+                    selectedNodesLM.addElement(item);
+                    nodesInsideClusterSet.remove(item);
+                    nodesInsideClusterLM.removeElementAt(selectedIndArr[i] - (i - start) + skip);
                 }
             }
-            allPrimInViewJList.clearSelection();
-            primEntInViewLM.set(0, "<html><b>All nodes contained in the clusters of the above list: " + (primEntInViewLM.size() - 1) + " nodes</b></html>");
+            nodesInsideClusterJList.clearSelection();
+            nodesInsideClusterLM.set(0, "<html><b>All nodes inside clusters in the current view: " + (nodesInsideClusterLM.size() - 1) + " nodes</b></html>");
 
         }
 
-
-        /* process all entities jList */
-
-        selectedIndArr = allOtherPrimJList.getSelectedIndices();
+        /* process JList of nodes outside the current view */
+        selectedIndArr = nodesOutsideViewJList.getSelectedIndices();
         start = 0;
         if (selectedIndArr.length > 0) {
-            //        System.out.println("selectedIndArr[0] "+selectedIndArr[0]);
-            if (selectedIndArr[0] == 0) {
+            if (selectedIndArr[0] == 0) 
                 start = 1;
-            }
 
             for (int i = start; i < selectedIndArr.length; i++) {
-                //            System.out.println("selectedIndArr[i] "+selectedIndArr[i]);
-
-                //            System.out.println("element at "+allPrimEntLM.elementAt(selectedIndArr[i]-(i-start)));
-                selectedNodesLM.addElement(primEntLM.elementAt(selectedIndArr[i] - (i - start)));
-                otherPrimEntSet.remove(primEntLM.elementAt(selectedIndArr[i] - (i - start)));
-                primEntLM.removeElementAt(selectedIndArr[i] - (i - start));
-
+                Object item = nodesOutsideViewLM.elementAt(selectedIndArr[i] - (i - start));
+                selectedNodesLM.addElement(item);
+                nodesOutsideViewSet.remove(item);
+                nodesOutsideViewLM.removeElementAt(selectedIndArr[i] - (i - start));
             }
-
-            allOtherPrimJList.clearSelection();
-            primEntLM.set(0, "<html><b>All other nodes not in this view: " + (primEntLM.size() - 1) + " nodes</b></html>");
+            nodesOutsideViewJList.clearSelection();
+            nodesOutsideViewLM.set(0, "<html><b>All nodes NOT in the current view: " + (nodesOutsideViewLM.size() - 1) + " nodes</b></html>");
         }
         selectedNodesLM.set(0, "<html><b>Selected items: " + (selectedNodesLM.size() - 1) + " items</b></html>");
 }//GEN-LAST:event_AddButtonActionPerformed
@@ -617,7 +582,6 @@ public class MakeCustomGraphViewDialog extends javax.swing.JDialog {
     private void searchBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchBoxActionPerformed
         // TODO add your handling code here:
 }//GEN-LAST:event_searchBoxActionPerformed
-
     private int removeTextCounter = 0;
     private void removeDefaultText(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_removeDefaultText
 //        if (removeTextCounter > 0)
@@ -635,6 +599,10 @@ public class MakeCustomGraphViewDialog extends javax.swing.JDialog {
 
     public boolean isAnswerOK() {
         return answerOK;
+    }
+    
+    public Set getSelectedNodeSet() {
+        return selectedNodeSet;
     }
 
     /**
@@ -660,9 +628,6 @@ public class MakeCustomGraphViewDialog extends javax.swing.JDialog {
     private javax.swing.JButton CancelButton;
     private javax.swing.JButton OKButton;
     private javax.swing.JButton RemoveButton;
-    private javax.swing.JList allNodesInViewJList;
-    private javax.swing.JList allOtherPrimJList;
-    private javax.swing.JList allPrimInViewJList;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -684,25 +649,57 @@ public class MakeCustomGraphViewDialog extends javax.swing.JDialog {
     private javax.swing.JTextArea jTextArea3;
     private javax.swing.JTextArea jTextArea4;
     private javax.swing.JPanel mainPanel;
+    /* nodesClustersInViewJList is a JList of nodesClustersInViewSet */
+    private javax.swing.JList nodesClustersInViewJList;
+    /* nodesInsideClusterJList is a JList of nodesInsideClusterSet*/
+    private javax.swing.JList nodesInsideClusterJList;
+    /* nodesOutsideViewJList is a JList of nodesOutsideViewSet*/
+    private javax.swing.JList nodesOutsideViewJList;
     private javax.swing.JTextField searchBox;
     private javax.swing.JList selectedNodesJList;
     // End of variables declaration//GEN-END:variables
     private Graph dynamicGraph;
     private Graph realGraph;
-    private DefaultListModel primEntLM;
-    private DefaultListModel oriAllPrimEntLM;
-    private DefaultListModel nodesInViewLM;
-    private DefaultListModel oriAllNodesInViewLM;
-    private DefaultListModel primEntInViewLM;
-    private DefaultListModel oriAllPrimEntInViewLM;
+    
+   
+    
+    /* nodesClustersInViewSet contains every cluster/node appearing in a view */
+    private Set nodesClustersInViewSet = new TreeSet(new NodeClusterComparator());
+    /* nodesClustersInViewLM is a list model of nodesClustersInViewSet */
+    private DefaultListModel nodesClustersInViewLM;
+    /* oriNodesClustersInViewLM is an unmodified version of nodesClustersInViewLM */
+    private DefaultListModel oriNodesClustersInViewLM;
+    
+    /* nodesInsideClusterSet contains nodes insides clusters in a view */
+    private Set nodesInsideClusterSet = new TreeSet(new BioObjectComparator());
+    /* nodesInsideClusterLM is a list model of nodesInsideClusterSet */
+    private DefaultListModel nodesInsideClusterLM;
+    /* oriNodesInsideClusterLM is an unmodified version of nodesInsideClusterLM */
+    private DefaultListModel oriNodesInsideClusterLM;
+    
+    /* nodesOutsideViewSet contains all nodes NOT appearing in a view */
+    private Set nodesOutsideViewSet = new TreeSet(new BioObjectComparator());
+    /* nodesOutsideViewLM is a list model of nodesOutsideViewSet */
+    private DefaultListModel nodesOutsideViewLM;
+    /* oriNodesOutsideViewLM is an unmodified version of nodesOutsideViewLM */
+    private DefaultListModel oriNodesOutsideViewLM;
+    
+    /* selectedNodesLM is a list model of selectNodeJList */
     private DefaultListModel selectedNodesLM = new DefaultListModel();
+    /* oriSelectedNodesLM is an unmodified version of selectedNodesLM */
     private DefaultListModel oriSelectedNodesLM = new DefaultListModel();
-    private Set primEntInViewSet = new TreeSet(new BioObjectComparator());
-    private Set primEntSetToBeRemoved = new TreeSet(new BioObjectComparator());
-    private Set primEntInViewSetCopy = new TreeSet(new BioObjectComparator());
+    
+    private Set nodesOutsideClusterSet = new TreeSet(new BioObjectComparator());
+    private Set nodesInsideClusterSetCopy = new TreeSet(new BioObjectComparator());
+    
+    private boolean answerOK = false;
+    private Set selectedNodeSet = new HashSet();
+    final Color ERROR_COLOR = Color.PINK;
+    Color searchBoxBg;
+    final static String CANCEL_ACTION = "cancel-search";
 
     class NodeClusterComparator implements Comparator {
-
+        /* compare between cluster/cluster, cluster/BioObject, or BioObject/BioObject */
         @Override
         public int compare(Object o1, Object o2) {
             if (o1 instanceof BioObject && o2 instanceof BioObject) {
@@ -732,17 +729,6 @@ public class MakeCustomGraphViewDialog extends javax.swing.JDialog {
 
         }
     }
-    private Set nodesInViewSet = new TreeSet(new NodeClusterComparator());
-    private Set otherPrimEntSet = new TreeSet(new BioObjectComparator());
-    private boolean answerOK = false;
-    private Set selectedNodeSet = new HashSet();
-    final Color ERROR_COLOR = Color.PINK;
-    Color searchBoxBg;
-    final static String CANCEL_ACTION = "cancel-search";
-
-    public Set getSelectedNodeSet() {
-        return selectedNodeSet;
-    }
 
     class CancelAction extends AbstractAction {
 
@@ -761,59 +747,56 @@ public class MakeCustomGraphViewDialog extends javax.swing.JDialog {
 
             /* clear all lists and populate all entities that are not selected */
             String s = searchBox.getText();
-            
+
+            /* not searched; Populate all lists as usual */
             if (s.length() <= 0) {
-//                message("Nothing to search");
                 searchBox.setText("");
                 searchBox.setBackground(searchBoxBg);
 
-//        nodesInViewLM.clear();
-                nodesInViewLM = new DefaultListModel();
-                for (Object o : nodesInViewSet) {
-                    nodesInViewLM.addElement(o);
+                nodesClustersInViewLM = new DefaultListModel();
+                for (Object o : nodesClustersInViewSet) {
+                    nodesClustersInViewLM.addElement(o);
                 }
-                nodesInViewLM.insertElementAt("<html><b>All clusters/nodes in the current view: " + nodesInViewLM.size() + " clusters/nodes</b></html>", 0);
-                allNodesInViewJList.setModel(nodesInViewLM);
+                nodesClustersInViewLM.insertElementAt("<html><b>All clusters and nodes in the current view: " + nodesClustersInViewLM.size() + " clusters/nodes</b></html>", 0);
+                nodesClustersInViewJList.setModel(nodesClustersInViewLM);
 
-                primEntInViewLM = new DefaultListModel();
-//        primEntInViewLM.clear();
-                for (Object o : primEntInViewSet) {
-                    primEntInViewLM.addElement(o);
+                nodesInsideClusterLM = new DefaultListModel();
+                for (Object o : nodesInsideClusterSet) {
+                    nodesInsideClusterLM.addElement(o);
                 }
-                primEntInViewLM.insertElementAt("<html><b>All nodes contained in the clusters of the above list: " + primEntInViewLM.size() + " nodes</b></html>", 0);
-                allPrimInViewJList.setModel(primEntInViewLM);
+                nodesInsideClusterLM.insertElementAt("<html><b>All nodes inside clusters in the current view: " + nodesInsideClusterLM.size() + " nodes</b></html>", 0);
+                nodesInsideClusterJList.setModel(nodesInsideClusterLM);
 
-//        primEntLM.clear();
-                primEntLM = new DefaultListModel();
-                for (Object o : otherPrimEntSet) {
-                    primEntLM.addElement(o);
+                nodesOutsideViewLM = new DefaultListModel();
+                for (Object o : nodesOutsideViewSet) {
+                    nodesOutsideViewLM.addElement(o);
                 }
-                primEntLM.insertElementAt("<html><b>All other nodes not in this view: " + primEntLM.size() + " nodes</b></html>", 0);
-                allOtherPrimJList.setModel(primEntLM);
-                
+                nodesOutsideViewLM.insertElementAt("<html><b>All nodes NOT in the current view: " + nodesOutsideViewLM.size() + " nodes</b></html>", 0);
+                nodesOutsideViewJList.setModel(nodesOutsideViewLM);
+
                 return;
             }
-            
+
             /* filter only nodes whose names start with the search name */
+            
             /* all nodes and clusters in the current view */
-            Set filteredAllNodesInViewSet = new TreeSet(new NodeClusterComparator());
-//            System.out.println("nodesInViewSet "+nodesInViewSet.size());
-            for (Object obj : nodesInViewSet) {
+            Set filteredNodesClustersInViewSet = new TreeSet(new NodeClusterComparator());
+            for (Object obj : nodesClustersInViewSet) {
                 if (obj instanceof BioObject) {
                     BioObject bioObj = (BioObject) obj;
                     if (bioObj.getName().toUpperCase().startsWith(s.toUpperCase()) || (bioObj.getStandardName().toUpperCase().startsWith(s.toUpperCase()))
                             || (bioObj.getObjName().toUpperCase().startsWith(s.toUpperCase()))) {
-                        filteredAllNodesInViewSet.add(bioObj);
+                        filteredNodesClustersInViewSet.add(bioObj);
                     } else {
-                        
                         for (String st : bioObj.getSynonym()) {
                             if (st.toUpperCase().startsWith(s.toUpperCase())) {
-                                filteredAllNodesInViewSet.add(bioObj);
+                                filteredNodesClustersInViewSet.add(bioObj);
                                 break;
                             }
                         }
-                        
+
                     }
+                    
                 } else if (obj instanceof Set) {
                     Set set = (Set) obj;
                     for (Object element : set) {
@@ -821,18 +804,17 @@ public class MakeCustomGraphViewDialog extends javax.swing.JDialog {
                             BioObject bioObj = (BioObject) element;
                             if (bioObj.getName().toUpperCase().startsWith(s.toUpperCase()) || (bioObj.getStandardName().toUpperCase().startsWith(s.toUpperCase()))
                                     || (bioObj.getObjName().toUpperCase().startsWith(s.toUpperCase()))) {
-                                filteredAllNodesInViewSet.add(set);
+                                filteredNodesClustersInViewSet.add(set);
                                 break;
                             } else {
                                 boolean br = false;
                                 for (String st : bioObj.getSynonym()) {
                                     if (st.toUpperCase().startsWith(s.toUpperCase())) {
-                                        filteredAllNodesInViewSet.add(set);
+                                        filteredNodesClustersInViewSet.add(set);
                                         br = true;
                                     }
                                 }
-                                if (br)
-                                {
+                                if (br) {
                                     break;
                                 }
                             }
@@ -840,20 +822,19 @@ public class MakeCustomGraphViewDialog extends javax.swing.JDialog {
                     }
                 }
             }
-//            System.out.println("filteredAllNodesInViewSet "+filteredAllNodesInViewSet.size());
-//            System.out.println("primEntInViewSet "+primEntInViewSet.size());
-            /* all primitive entities in the current view */
-            Set filteredPrimEntInViewSet = new TreeSet(new NodeClusterComparator());
-            for (Object obj : primEntInViewSet) {
+
+            /* all nodes inside clusters in the current view */
+            Set filteredNodesInsideClustersSet = new TreeSet(new NodeClusterComparator());
+            for (Object obj : nodesInsideClusterSet) {
                 if (obj instanceof BioObject) {
                     BioObject bioObj = (BioObject) obj;
                     if (bioObj.getName().toUpperCase().startsWith(s.toUpperCase()) || (bioObj.getStandardName().toUpperCase().startsWith(s.toUpperCase()))
                             || (bioObj.getObjName().toUpperCase().startsWith(s.toUpperCase()))) {
-                        filteredPrimEntInViewSet.add(bioObj);
+                        filteredNodesInsideClustersSet.add(bioObj);
                     } else {
                         for (String st : bioObj.getSynonym()) {
                             if (st.toUpperCase().startsWith(s.toUpperCase())) {
-                                filteredPrimEntInViewSet.add(bioObj);
+                                filteredNodesInsideClustersSet.add(bioObj);
                                 break;
                             }
                         }
@@ -861,98 +842,63 @@ public class MakeCustomGraphViewDialog extends javax.swing.JDialog {
                 }
 
             }
-//            System.out.println("filteredPrimEntInViewSet "+filteredPrimEntInViewSet.size());
-//            System.out.println("otherPrimEntSet "+otherPrimEntSet.size());
+
             /* all primitive entities in the graph */
-            Set filteredAllPrimEntSet = new TreeSet(new NodeClusterComparator());
-            for (Object obj : otherPrimEntSet) {
+            Set filteredNodesOutsideViewSet = new TreeSet(new NodeClusterComparator());
+            for (Object obj : nodesOutsideViewSet) {
                 if (obj instanceof BioObject) {
                     BioObject bioObj = (BioObject) obj;
                     if (bioObj.getName().toUpperCase().startsWith(s.toUpperCase()) || (bioObj.getStandardName().toUpperCase().startsWith(s.toUpperCase()))
                             || (bioObj.getObjName().toUpperCase().startsWith(s.toUpperCase()))) {
-                        filteredAllPrimEntSet.add(bioObj);
+                        filteredNodesOutsideViewSet.add(bioObj);
                     } else {
                         for (String st : bioObj.getSynonym()) {
                             if (st.toUpperCase().startsWith(s.toUpperCase())) {
-                                filteredAllPrimEntSet.add(bioObj);
+                                filteredNodesOutsideViewSet.add(bioObj);
                                 break;
                             }
                         }
                     }
-                } 
+                }
 
             }
-//            System.out.println("filteredAllPrimEntSet "+filteredAllPrimEntSet.size());
-            
+
             /* update the three lists */
-            if (filteredAllNodesInViewSet.isEmpty() && filteredAllPrimEntSet.isEmpty() && filteredPrimEntInViewSet.isEmpty()){
-//                System.out.println("all empty");
+            if (filteredNodesClustersInViewSet.isEmpty() && filteredNodesOutsideViewSet.isEmpty() && filteredNodesInsideClustersSet.isEmpty()) {
+                /* not found at all */
                 searchBox.setBackground(ERROR_COLOR);
             } else {
-                nodesInViewLM = new DefaultListModel();
-                if (!filteredAllNodesInViewSet.isEmpty()) {
-
-
-                    for (Object o : filteredAllNodesInViewSet) {
-                        nodesInViewLM.addElement(o);
+                nodesClustersInViewLM = new DefaultListModel();
+                if (!filteredNodesClustersInViewSet.isEmpty()) {
+                    for (Object o : filteredNodesClustersInViewSet) {
+                        nodesClustersInViewLM.addElement(o);
                     }
-//                    System.out.println("filteredAllNodesInViewSet not empty");
-//                    System.out.println("nodesInViewLM "+filteredAllNodesInViewSet.size());
-//                allNodesInViewJList.updateUI();
-//                allNodesInViewJList.setModel();
                 }
-                nodesInViewLM.insertElementAt("<html><b>All clusters/nodes in the current view: " + nodesInViewLM.size() + " clusters/nodes</b></html>", 0);
-                allNodesInViewJList.setModel(nodesInViewLM);
+                nodesClustersInViewLM.insertElementAt("<html><b>All clusters and nodes in the current view: " + nodesClustersInViewLM.size() + " clusters/nodes</b></html>", 0);
+                nodesClustersInViewJList.setModel(nodesClustersInViewLM);
 
-//                primEntInViewLM.clear();
-                primEntInViewLM = new DefaultListModel();
-                if (!filteredPrimEntInViewSet.isEmpty()) {
-                    
-                    for (Object o : filteredPrimEntInViewSet) {
-                        primEntInViewLM.addElement(o);
+                nodesInsideClusterLM = new DefaultListModel();
+                if (!filteredNodesInsideClustersSet.isEmpty()) {
+
+                    for (Object o : filteredNodesInsideClustersSet) {
+                        nodesInsideClusterLM.addElement(o);
                     }
-//                    System.out.println("filteredPrimEntInViewSet not empty");
-//                    System.out.println("primEntInViewLM "+filteredPrimEntInViewSet.size());
                 }
-                primEntInViewLM.insertElementAt("<html><b>All nodes contained in the clusters of the above list: " + primEntInViewLM.size() + " nodes</b></html>", 0);
-                allPrimInViewJList.setModel(primEntInViewLM);
+                nodesInsideClusterLM.insertElementAt("<html><b>All nodes inside clusters in the current view: " + nodesInsideClusterLM.size() + " nodes</b></html>", 0);
+                nodesClustersInViewJList.setModel(nodesInsideClusterLM);
 
-//                primEntLM.clear();
-                primEntLM = new DefaultListModel();
-                if (!filteredAllPrimEntSet.isEmpty()) {
+                nodesOutsideViewLM = new DefaultListModel();
+                if (!filteredNodesOutsideViewSet.isEmpty()) {
 
-                    for (Object o : filteredAllPrimEntSet) {
-                        primEntLM.addElement(o);
+                    for (Object o : filteredNodesOutsideViewSet) {
+                        nodesOutsideViewLM.addElement(o);
                     }
-//                    System.out.println("filteredAllPrimEntSet not empty");
-//                    System.out.println("primEntLM "+filteredAllPrimEntSet.size());
                 }
-                primEntLM.insertElementAt("<html><b>All other nodes not in this view: " + primEntLM.size() + " nodes</b></html>", 0);
-                allOtherPrimJList.setModel(primEntLM);
+                nodesOutsideViewLM.insertElementAt("<html><b>All nodes NOT in the current view: " + nodesOutsideViewLM.size() + " nodes</b></html>", 0);
+                nodesOutsideViewJList.setModel(nodesOutsideViewLM);
 
             }
-            
 
-            /*
-             * deal with searching the three JLists 
-             * filter the Jlists 
-             */
-//            String content = textArea.getText();
-//            int index = content.indexOf(s, 0);
-//            if (index >= 0) {   // match found
-//                try {
-//                    int end = index + s.length();
-////                    hilit.addHighlight(index, end, painter);
-////                    textArea.setCaretPosition(end);
-//                    searchBox.setBackground(searchBoxBg);
-////                    message("'" + s + "' found. Press ESC to end search");
-//                } catch (BadLocationException e) {
-//                    e.printStackTrace();
-//                }
-//            } else {
-//                searchBox.setBackground(ERROR_COLOR);
-////                message("'" + s + "' not found. Press ESC to start a new search");
-//            }
         }
 
         @Override

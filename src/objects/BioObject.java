@@ -1,5 +1,4 @@
-
-package main;
+package objects;
 
 import java.util.ArrayList;
 
@@ -13,7 +12,7 @@ public class BioObject extends Object {
     protected String databaseID = "";
     protected String databaseName = "";
     protected String name = "";
-    // name 2 is the standard name in sgd database
+    // standardName is the standard name in sgd database
     protected String standardName = "";
     protected ArrayList<String> synonym = new ArrayList<String>();
     protected String type = "";

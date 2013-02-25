@@ -29,12 +29,6 @@ public class SGDInteraction {
     protected ArrayList<String> referenceList = new ArrayList<String>();
     protected ArrayList<String> citationList = new ArrayList<String>();
 
-    public SGDInteraction(Object bait, Object hit) {
-        this.bait = bait;
-        this.hit = hit;
-    }
-
-
     @Override
     public String toString() {
         return bait+"<->"+hit;

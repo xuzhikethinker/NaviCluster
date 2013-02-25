@@ -26,9 +26,6 @@ nalapro01
 
 41c5a7f8-2931-4610-8c64-9b6ca5e0e7aa
 
-main
-dir
-
 LouvainAlgorithm
 dir
 
@@ -39,15 +36,25 @@ add
 datasets
 dir
 
+examples
+dir
+
 fromjungsource
 dir
 
 kmean
 dir
 
-util
+main
 dir
 
-examples
+objects
+dir
+
+
+
+add
+
+util
 dir
 

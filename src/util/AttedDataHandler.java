@@ -21,8 +21,8 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
-import main.BioObject;
-import main.CoExpRelation;
+import objects.BioObject;
+import objects.CoExpRelation;
 
 /**
  *

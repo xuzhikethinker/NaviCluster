@@ -32,9 +32,9 @@ import java.awt.geom.Point2D;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Map;
-import main.MetaEdge;
-import main.PropertyEdge;
-import main.SGDInteraction;
+import objects.MetaEdge;
+import objects.PropertyEdge;
+import objects.SGDInteraction;
 
 /**
  * The SpringLayout package represents a visualization of a set of nodes. The

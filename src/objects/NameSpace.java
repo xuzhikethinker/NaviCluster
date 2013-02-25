@@ -1,20 +1,17 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-package main;
+package objects;
 
 import java.awt.Color;
 
 /**
  *
- * @author Knacky
+ * @author Thanet (Knack) Praneenararat, Department of Computational Biology, The University of Tokyo
  */
 public class NameSpace {
     private String name = "ALL";
     private double weight = 1.0;
+    /* color is used for coloring namespace adjustment slider knobs */
     private Color color = new Color(0, 0, 0);
+    
     public NameSpace(String name, double weight){
         this.name = name;
         this.weight = weight;
@@ -74,15 +71,4 @@ public class NameSpace {
         return hash;
     }
     
-
-
-//    public static NameSpace getNameSpace(String s) {
-//        if (s.equals("biological_process")) {
-//            return BP;
-//        } else if (s.equals("molecular_function")) {
-//            return MF;
-//        } else {
-//            return CC;
-//        }
-//    }
 }

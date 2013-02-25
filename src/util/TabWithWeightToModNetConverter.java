@@ -25,8 +25,8 @@ import java.util.SortedSet;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import main.BioEdge;
-import main.BioObject;
+import objects.BioEdge;
+import objects.BioObject;
 
 /**
  *

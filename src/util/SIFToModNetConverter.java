@@ -19,8 +19,8 @@ import java.util.Comparator;
 import java.util.SortedSet;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
-import main.BioObject;
-import main.SGDInteraction;
+import objects.BioObject;
+import objects.SGDInteraction;
 
 /**
  *

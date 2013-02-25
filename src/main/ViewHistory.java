@@ -5,6 +5,8 @@
 
 package main;
 
+import objects.PropertyTerm;
+import objects.BioObject;
 import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.graph.Graph;
 import java.awt.Color;
